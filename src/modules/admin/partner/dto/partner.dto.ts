@@ -31,30 +31,50 @@ export class JsonContentDto {
 }
 
 export class CreatePartnerDto {
-    @ApiProperty()
-    @ValidateNested()
+    @ApiProperty({ 
+        description: 'Partner name',
+        example: 'Football Club Barcelona'
+    })
+    @IsString()
     name: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Partner description in multiple languages',
+        type: JsonContentDto 
+    })
     @ValidateNested()
     @Type(() => JsonContentDto)
     description: JsonContentDto;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Partner logo/image URL',
+        example: '/uploads/partner-logo.png'
+    })
     @IsString()
     image: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Partner contact phone number',
+        example: '+998901234567'
+    })
     @IsString()
     phone: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Partner contact email',
+        example: 'contact@partner.com'
+    })
     @IsString()
     email: string;
 }
 
 export class UpdatePartnerDto extends PartialType(CreatePartnerDto) {
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Partner status',
+        enum: PartnerStatus,
+        example: PartnerStatus.ACTIVE,
+        required: false
+    })
     @IsOptional()
     status?: PartnerStatus;
 }

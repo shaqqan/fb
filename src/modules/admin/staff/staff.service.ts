@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreateStaffDto, UpdateStaffDto } from './dto/staff.dto';
 import { Staff } from '../../../databases/typeorm/entities';
 
@@ -18,8 +19,21 @@ export class StaffService {
         });
     }
 
-    async getAll(): Promise<Staff[]> {
-        return this.staffRepository.find();
+    async getAll(query: PaginateQuery): Promise<Paginated<Staff>> {
+        const queryBuilder = this.staffRepository.createQueryBuilder('staff');
+
+        return paginate(query, queryBuilder, {
+            sortableColumns: ['id', 'fullname', 'position', 'status', 'createdAt'],
+            nullSort: 'last',
+            defaultSortBy: [['createdAt', 'DESC']],
+            searchableColumns: ['fullname', 'position', 'email'],
+            filterableColumns: {
+                status: true,
+                position: true,
+            },
+            defaultLimit: 10,
+            maxLimit: 100,
+        });
     }
 
 

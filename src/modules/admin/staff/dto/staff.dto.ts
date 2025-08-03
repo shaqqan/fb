@@ -31,34 +31,57 @@ export class JsonContentDto {
 }
 
 export class CreateStaffDto {
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Full name of the staff member',
+        example: 'John Doe'
+    })
     @IsString()
     fullname: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Position/role of the staff member',
+        example: 'Head Coach'
+    })
     @IsString()
     position: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Staff member information/bio in multiple languages',
+        type: JsonContentDto 
+    })
     @ValidateNested()
     @Type(() => JsonContentDto)
     information: JsonContentDto;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Staff member photo URL',
+        example: '/uploads/staff-photo.jpg'
+    })
     @IsString()
     image: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Staff member contact phone number',
+        example: '+998901234567'
+    })
     @IsString()
     phone: string;
 
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Staff member contact email',
+        example: 'john.doe@club.com'
+    })
     @IsString()
     email: string;
 }
 
 export class UpdateStaffDto extends PartialType(CreateStaffDto) {
-    @ApiProperty()
+    @ApiProperty({ 
+        description: 'Staff member status',
+        enum: StaffStatus,
+        example: StaffStatus.ACTIVE,
+        required: false
+    })
     @IsOptional()
     status?: StaffStatus;
 }

@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ClubSubLeague } from './club-sub-league.entity';
+import { League } from './league.entity';
 
 @Entity('club')
 export class Club {
@@ -19,8 +21,9 @@ export class Club {
   @Column()
   logo: string;
 
-  @OneToMany(() => ClubSubLeague, (clubSubLeague) => clubSubLeague.club)
-  subLinks: ClubSubLeague[];
+  @ManyToOne(() => League, (league) => league.clubs)
+  @JoinColumn({ name: 'leagueId' })
+  league: League;
 
   @CreateDateColumn()
   createdAt: Date;

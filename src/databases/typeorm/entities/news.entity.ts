@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  AfterLoad,
 } from 'typeorm';
 import { NewsStatus } from './enums';
 import { User } from './user.entity';
@@ -46,4 +47,11 @@ export class News {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @AfterLoad()
+  setAssetToImages() {
+    this.images = this.images.map((image) => {
+      return `${process.env.BASE_URL}${image}`;
+    });
+  }
 }

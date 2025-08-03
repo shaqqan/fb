@@ -19,17 +19,17 @@ import { News } from './databases/typeorm/entities';
       envFilePath: '.env',
       load: [appConfig, jwtConfig, typeormConfig, redisConfig],
     }),
-    // ScheduleModule.forRoot(),
-    // DatabasesModule,
-    // ModulesModule,
-    // TypeOrmModule.forFeature([News]),
+    ScheduleModule.forRoot(),
+    DatabasesModule,
+    ModulesModule,
+    TypeOrmModule.forFeature([News]),
   ],
   providers: [
-  //   {
-  //     provide: APP_GUARD,
-  //     useClass: AtGuard,
-  //   },
-  //   TasksService,
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
+    TasksService,
   ],
 })
 export class AppModule { }

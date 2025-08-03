@@ -16,7 +16,7 @@ export class ClubSubLeague {
   @PrimaryColumn()
   subLeagueId: number;
 
-  @ManyToOne(() => Club, (club) => club.subLinks)
+  @ManyToOne(() => Club)
   @JoinColumn({ name: 'clubId' })
   club: Club;
 

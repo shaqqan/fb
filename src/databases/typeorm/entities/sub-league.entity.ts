@@ -25,7 +25,7 @@ export class SubLeague {
   @Column()
   leagueId: number;
 
-  @ManyToOne(() => League, (league) => league.subleagues)
+  @ManyToOne(() => League)
   @JoinColumn({ name: 'leagueId' })
   league: League;
 

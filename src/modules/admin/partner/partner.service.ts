@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreatePartnerDto, UpdatePartnerDto } from './dto';
 import { Partner } from '../../../databases/typeorm/entities';
 
@@ -18,8 +19,20 @@ export class PartnerService {
         });
     }
 
-    async getAll(): Promise<Partner[]> {
-        return this.partnerRepository.find();
+    async getAll(query: PaginateQuery): Promise<Paginated<Partner>> {
+        const queryBuilder = this.partnerRepository.createQueryBuilder('partner');
+
+        return paginate(query, queryBuilder, {
+            sortableColumns: ['id', 'name', 'status', 'createdAt'],
+            nullSort: 'last',
+            defaultSortBy: [['createdAt', 'DESC']],
+            searchableColumns: ['name', 'email'],
+            filterableColumns: {
+                status: true,
+            },
+            defaultLimit: 10,
+            maxLimit: 100,
+        });
     }
 
 
