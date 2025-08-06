@@ -1,20 +1,20 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth,
-  ApiParam,
-  ApiBody,
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiParam,
+    ApiBody,
 } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
 import { Staff } from '../../../databases/typeorm/entities';
-import { Public } from 'src/common/decorators';
 import { CreateStaffDto, UpdateStaffDto } from './dto/staff.dto';
 import { StaffService } from './staff.service';
 
-@ApiTags('staff')
-@Controller('staff')
+@ApiTags('👥 Staff')
+@Controller('admin/staff')
+@ApiBearerAuth()
 export class StaffController {
     constructor(
         private readonly staffService: StaffService,
@@ -22,7 +22,6 @@ export class StaffController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Create a new staff member' })
     @ApiBody({ type: CreateStaffDto })
     @ApiResponse({ status: 201, description: 'Staff member created successfully', type: Staff })
@@ -31,7 +30,6 @@ export class StaffController {
         return this.staffService.create(dto);
     }
 
-    @Public()
     @Get()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get all staff members with pagination' })
@@ -42,8 +40,8 @@ export class StaffController {
         defaultLimit: 10,
         maxLimit: 100,
     })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'Paginated list of staff members',
         schema: {
             type: 'object',
@@ -79,7 +77,6 @@ export class StaffController {
         return this.staffService.getAll(query);
     }
 
-    @Public()
     @Get("/:id")
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get staff member by ID' })
@@ -92,7 +89,6 @@ export class StaffController {
 
     @Patch("/:id")
     @HttpCode(HttpStatus.OK)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update staff member' })
     @ApiParam({ name: 'id', description: 'Staff member ID', type: 'number' })
     @ApiBody({ type: UpdateStaffDto })
@@ -105,7 +101,6 @@ export class StaffController {
 
     @Delete("/:id")
     @HttpCode(HttpStatus.OK)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete staff member' })
     @ApiParam({ name: 'id', description: 'Staff member ID', type: 'number' })
     @ApiResponse({ status: 200, description: 'Staff member deleted successfully', type: Staff })

@@ -6,10 +6,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
@@ -20,10 +20,10 @@ import { AuthService } from './auth.service';
 import { AuthDto, SignUpDto } from './dto';
 import { Tokens } from '../../../common/types';
 
-@ApiTags('auth')
-@Controller('auth')
+@ApiTags('🔐 Authentication')
+@Controller('admin/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   // @Public()
   // @Post('signup')
@@ -52,8 +52,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Sign in user' })
   @ApiBody({ type: AuthDto })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User successfully signed in',
     type: 'object',
     schema: {
@@ -88,8 +88,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Refresh access token' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Token successfully refreshed',
     type: 'object',
     schema: {

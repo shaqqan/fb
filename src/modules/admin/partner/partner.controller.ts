@@ -1,20 +1,20 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth,
-  ApiParam,
-  ApiBody,
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiParam,
+    ApiBody,
 } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
 import { CreatePartnerDto, UpdatePartnerDto } from './dto';
 import { Partner } from '../../../databases/typeorm/entities';
-import { Public } from 'src/common/decorators';
 import { PartnerService } from './partner.service';
 
-@ApiTags('partner')
-@Controller('partner')
+@Controller('admin/partner')
+@ApiTags('🤝 Partner')
+@ApiBearerAuth()
 export class PartnerController {
     constructor(
         private readonly partnerService: PartnerService,
@@ -22,7 +22,6 @@ export class PartnerController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Create a new partner' })
     @ApiBody({ type: CreatePartnerDto })
     @ApiResponse({ status: 201, description: 'Partner created successfully', type: Partner })
@@ -31,7 +30,6 @@ export class PartnerController {
         return this.partnerService.create(dto);
     }
 
-    @Public()
     @Get()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get all partners with pagination' })
@@ -42,8 +40,8 @@ export class PartnerController {
         defaultLimit: 10,
         maxLimit: 100,
     })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'Paginated list of partners',
         schema: {
             type: 'object',
@@ -79,7 +77,6 @@ export class PartnerController {
         return this.partnerService.getAll(query);
     }
 
-    @Public()
     @Get("/:id")
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get partner by ID' })
@@ -92,7 +89,6 @@ export class PartnerController {
 
     @Patch("/:id")
     @HttpCode(HttpStatus.OK)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update partner' })
     @ApiParam({ name: 'id', description: 'Partner ID', type: 'number' })
     @ApiBody({ type: UpdatePartnerDto })
@@ -105,7 +101,6 @@ export class PartnerController {
 
     @Delete("/:id")
     @HttpCode(HttpStatus.OK)
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete partner' })
     @ApiParam({ name: 'id', description: 'Partner ID', type: 'number' })
     @ApiResponse({ status: 200, description: 'Partner deleted successfully', type: Partner })

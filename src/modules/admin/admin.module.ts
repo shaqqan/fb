@@ -5,7 +5,10 @@ import { StaffModule } from './staff/staff.module';
 import { PartnerModule } from './partner/partner.module';
 import { LeaguesModule } from './leagues/leagues.module';
 import { UploadModule } from './upload/upload.module';
-import { ClubSubLeagueModule } from './club-sub-league/club-sub-league.module';
+import { ClubModule } from './club/club.module';
+import { MatchScheduleModule } from './match-schedule/match-schedule.module';
+import { StadiumModule } from './stadium/stadium.module';
+import { PersonalModule } from './personal/personal.module';
 
 @Module({
   imports: [
@@ -15,7 +18,10 @@ import { ClubSubLeagueModule } from './club-sub-league/club-sub-league.module';
     PartnerModule,
     LeaguesModule,
     UploadModule,
-    ClubSubLeagueModule,
+    ClubModule,
+    MatchScheduleModule,
+    StadiumModule,
+    PersonalModule,
   ]
 })
 export class AdminModule {}

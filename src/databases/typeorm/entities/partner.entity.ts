@@ -11,8 +11,8 @@ export class Partner {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
+  @Column({ type: 'jsonb' })
+  name: any;
 
   @Column({ type: 'jsonb' })
   description: any;

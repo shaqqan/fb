@@ -6,12 +6,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  BaseEntity,
 } from 'typeorm';
-import { ClubSubLeague } from './club-sub-league.entity';
 import { League } from './league.entity';
 
 @Entity('club')
-export class Club {
+export class Club extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,6 +24,13 @@ export class Club {
   @ManyToOne(() => League, (league) => league.clubs)
   @JoinColumn({ name: 'leagueId' })
   league: League;
+
+  @ManyToOne(() => League, (subLeague) => subLeague.clubs)
+  @JoinColumn({ name: 'subLeagueId' })
+  subLeague: League;
+
+  @Column({ type: 'jsonb' })
+  information: any;
 
   @CreateDateColumn()
   createdAt: Date;

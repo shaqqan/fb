@@ -14,9 +14,9 @@ import { League } from '../../../databases/typeorm/entities';
 import { LeaguesService } from './leagues.service';
 import { Public } from 'src/common/decorators';
 
-@ApiTags('leagues')
+@ApiTags('🏆 Leagues')
 @ApiBearerAuth()
-@Controller('leagues')
+@Controller('admin/leagues')
 export class LeaguesController {
     constructor(
         private readonly leaguesService: LeaguesService,
@@ -32,7 +32,6 @@ export class LeaguesController {
         return this.leaguesService.create(dto);
     }
 
-    @Public()
     @Get()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get all leagues with pagination' })

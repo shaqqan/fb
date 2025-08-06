@@ -14,8 +14,8 @@ import { News, NewsStatus, User } from '../../../databases/typeorm/entities';
 import { NewsService } from './news.service';
 import { GetCurrentUser, GetCurrentUserId, Public } from 'src/common/decorators';
 
-@ApiTags('news')
-@Controller('news')
+@ApiTags('📰 News')
+@Controller('admin/news')
 @ApiBearerAuth()
 export class NewsController {
     constructor(

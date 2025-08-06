@@ -9,7 +9,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { SubLeague } from './sub-league.entity';
 import { Club } from './club.entity';
 
 @Entity('league')
