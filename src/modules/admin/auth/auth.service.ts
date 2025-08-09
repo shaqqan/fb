@@ -16,7 +16,7 @@ export class AuthService {
     private userRepository: Repository<User>,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async signup(dto: SignUpDto): Promise<Tokens> {
     const hash = await argon.hash(dto.password);
@@ -42,8 +42,29 @@ export class AuthService {
     return tokens;
   }
 
-  async signin(dto: AuthDto): Promise<Tokens> {
+  async signin(dto: AuthDto) {
     const user = await this.userRepository.findOne({
+      relations: {
+        roles: {
+          permissions: true,
+        },
+      },
+      select: {
+        id: true,
+        avatar: true,
+        email: true,
+        name: true,
+        hash: true,
+        hashedRt: true,
+        roles: {
+          id: true,
+          name: true,
+          permissions: {
+            id: true,
+            name: true,
+          },
+        },
+      },
       where: {
         email: dto.email,
       },
@@ -58,10 +79,17 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refresh_token);
 
     const { hash, hashedRt, ...userWithoutSensitiveData } = user;
-    
+
+    const permissions = user.roles?.flatMap((role) => role.permissions.map((permission) => permission.name));
+    const uniquePermissions = [...new Set(permissions)];
+
+    const roles = user.roles?.map((role) => role.name) ?? [];
+
     return ({
-      ...tokens,
-      ...userWithoutSensitiveData
+      ...userWithoutSensitiveData,
+      roles: roles,
+      permissions: uniquePermissions,
+      tokens,
     });
   }
 

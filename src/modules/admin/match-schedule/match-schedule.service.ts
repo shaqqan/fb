@@ -1,16 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreateMatchScheduleDto } from './dto/create-match-schedule.dto';
 import { UpdateMatchScheduleDto } from './dto/update-match-schedule.dto';
-import { Match, MatchStatus } from 'src/databases/typeorm/entities';
+import { CreateMatchScoreDto } from './dto/create-match-score.dto';
+import { UpdateMatchScoreDto } from './dto/update-match-score.dto';
+import { Match, MatchStatus, MatchScore } from 'src/databases/typeorm/entities';
 
 @Injectable()
 export class MatchScheduleService {
   constructor(
     @InjectRepository(Match)
     private matchRepository: Repository<Match>,
+    @InjectRepository(MatchScore)
+    private matchScoreRepository: Repository<MatchScore>,
   ) { }
 
   async create(createMatchScheduleDto: CreateMatchScheduleDto): Promise<Match> {
@@ -34,10 +38,9 @@ export class MatchScheduleService {
       .leftJoinAndSelect('match.opponentLeague', 'opponentLeague')
       .leftJoinAndSelect('match.opponentSubLeague', 'opponentSubLeague')
       .leftJoinAndSelect('match.stadium', 'stadium')
+      .leftJoinAndSelect('match.matchScores', 'matchScores')
       .select([
         'match.id',
-        'match.clubScore',
-        'match.opponentClubScore',
         'match.matchDate',
         'match.status',
         'match.createdAt',
@@ -59,7 +62,12 @@ export class MatchScheduleService {
         'stadium.id',
         'stadium.name',
         'stadium.address',
-        'stadium.city'
+        'stadium.city',
+        'matchScores.id',
+        'matchScores.clubScore',
+        'matchScores.opponentClubScore',
+        'matchScores.createdAt',
+        'matchScores.updatedAt'
       ]);
 
     // Apply custom filters
@@ -173,12 +181,11 @@ export class MatchScheduleService {
         'opponentClub',
         'opponentLeague',
         'opponentSubLeague',
-        'stadium'
+        'stadium',
+        'matchScores'
       ],
       select: {
         id: true,
-        clubScore: true,
-        opponentClubScore: true,
         matchDate: true,
         status: true,
         createdAt: true,
@@ -215,6 +222,7 @@ export class MatchScheduleService {
           address: true,
           city: true,
         },
+        matchScores: true,
       },
     });
 
@@ -280,5 +288,62 @@ export class MatchScheduleService {
     await this.matchRepository.remove(match);
 
     return { message: `Match with ID ${id} has been successfully deleted` };
+  }
+
+  async createScore(matchId: number, dto: CreateMatchScoreDto): Promise<MatchScore> {
+    const match = await this.matchRepository.findOne({ 
+      where: { id: matchId },
+      relations: ['matchScores'] 
+    });
+
+    if (!match) {
+      throw new NotFoundException(`Match with ID ${matchId} not found`);
+    }
+
+    if (match.matchScores && match.matchScores.length > 0) {
+      throw new BadRequestException(`Match with ID ${matchId} already has a score`);
+    }
+
+    const score = this.matchScoreRepository.create({
+      matchId,
+      clubScore: dto.clubScore,
+      opponentClubScore: dto.opponentClubScore,
+    });
+
+    return await this.matchScoreRepository.save(score);
+  }
+
+  async getScore(matchId: number): Promise<MatchScore> {
+    const score = await this.matchScoreRepository.findOne({
+      where: { matchId },
+      relations: ['match'],
+    });
+
+    if (!score) {
+      throw new NotFoundException(`Score for match with ID ${matchId} not found`);
+    }
+
+    return score;
+  }
+
+  async updateScore(matchId: number, dto: UpdateMatchScoreDto): Promise<MatchScore> {
+    const score = await this.getScore(matchId);
+
+    if (dto.clubScore !== undefined) {
+      score.clubScore = dto.clubScore;
+    }
+
+    if (dto.opponentClubScore !== undefined) {
+      score.opponentClubScore = dto.opponentClubScore;
+    }
+
+    return await this.matchScoreRepository.save(score);
+  }
+
+  async removeScore(matchId: number): Promise<{ message: string }> {
+    const score = await this.getScore(matchId);
+    await this.matchScoreRepository.remove(score);
+
+    return { message: `Score for match with ID ${matchId} has been successfully deleted` };
   }
 }

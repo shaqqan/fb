@@ -16,14 +16,6 @@ export class CreateMatchScheduleDto {
   clubId: number;
 
   @ApiProperty({
-    description: 'Club score',
-    example: 2
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  clubScore: number;
-
-  @ApiProperty({
     description: 'Club league ID',
     example: 1
   })
@@ -49,14 +41,6 @@ export class CreateMatchScheduleDto {
   @IsNumber()
   @Exists(Club, 'id')
   opponentClubId: number;
-
-  @ApiProperty({
-    description: 'Opponent club score',
-    example: 1
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  opponentClubScore: number;
 
   @ApiProperty({
     description: 'Opponent league ID',
@@ -96,7 +80,7 @@ export class CreateMatchScheduleDto {
   @ApiProperty({
     description: 'Match status',
     enum: MatchStatus,
-    example: MatchStatus.PENDING
+    example: MatchStatus.SCHEDULED
   })
   @IsOptional()
   @IsEnum(MatchStatus)

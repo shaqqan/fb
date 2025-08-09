@@ -5,27 +5,40 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  JoinTable,
+  ManyToMany,
+  BaseEntity,
 } from 'typeorm';
-import { Role } from './enums';
 import { News } from './news.entity';
+import { Role } from './role.entity';
 
 @Entity('users')
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  avatar: string;
 
   @Column({ nullable: true })
   name: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true }) 
   email: string;
 
-  @Column({
-    type: 'enum',
-    enum: Role,
-    default: Role.MODER,
+  @ManyToMany(() => Role)
+  @JoinTable({
+    name: 'user_role_relation',
+    joinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'roleId',
+      referencedColumnName: 'id',
+    },
   })
-  role: Role;
+  roles: Role[];
 
   @Column()
   hash: string;

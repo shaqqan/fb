@@ -68,7 +68,7 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 403, description: 'Access denied' })
-  signin(@Body() dto: AuthDto): Promise<Tokens> {
+  signin(@Body() dto: AuthDto) {
     return this.authService.signin(dto);
   }
 

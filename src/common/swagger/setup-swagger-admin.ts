@@ -11,7 +11,7 @@ export const setupSwaggerAdmin = (app: INestApplication): void => {
         .setContact('Football Board Support Team', 'https://footballboard.uz', 'support@footballboard.uz')
         .setLicense('Proprietary License', 'https://footballboard.uz')
         .addServer('http://127.0.0.1:' + process.env.PORT, 'Local Development Server')
-        .addServer('https://api.footballboard.uz', 'Production Server')
+        .addServer('http://95.182.119.11:3002', 'Server')
         .addGlobalParameters({
             name: 'x-lang',
             in: 'header',

@@ -9,6 +9,8 @@ import { ClubModule } from './club/club.module';
 import { MatchScheduleModule } from './match-schedule/match-schedule.module';
 import { StadiumModule } from './stadium/stadium.module';
 import { PersonalModule } from './personal/personal.module';
+import { RoleModule } from './role/role.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { PersonalModule } from './personal/personal.module';
     MatchScheduleModule,
     StadiumModule,
     PersonalModule,
+    RoleModule,
+    PermissionModule,
   ]
 })
 export class AdminModule {}

@@ -22,7 +22,9 @@ import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-p
 import { MatchScheduleService } from './match-schedule.service';
 import { CreateMatchScheduleDto } from './dto/create-match-schedule.dto';
 import { UpdateMatchScheduleDto } from './dto/update-match-schedule.dto';
-import { Match } from 'src/databases/typeorm/entities';
+import { CreateMatchScoreDto } from './dto/create-match-score.dto';
+import { UpdateMatchScoreDto } from './dto/update-match-score.dto';
+import { Match, MatchScore } from 'src/databases/typeorm/entities';
 
 @ApiTags('🏟️ Match Schedule')
 @ApiBearerAuth()
@@ -161,4 +163,90 @@ export class MatchScheduleController {
   remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     return this.matchScheduleService.remove(id);
   }
+
+  @Post(':id/score')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create match score for a scheduled match' })
+  @ApiParam({ name: 'id', description: 'Match schedule ID', type: 'number' })
+  @ApiBody({ type: CreateMatchScoreDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Match score created successfully',
+    type: MatchScore 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Match not found' 
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Match already has a score' 
+  })
+  createScore(
+    @Param('id', ParseIntPipe) id: number, 
+    @Body() createMatchScoreDto: CreateMatchScoreDto
+  ): Promise<MatchScore> {
+    return this.matchScheduleService.createScore(id, createMatchScoreDto);
+  }
+
+  @Get(':id/score')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get match score' })
+  @ApiParam({ name: 'id', description: 'Match schedule ID', type: 'number' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Match score found',
+    type: MatchScore 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Match or score not found' 
+  })
+  getScore(@Param('id', ParseIntPipe) id: number): Promise<MatchScore> {
+    return this.matchScheduleService.getScore(id);
+  }
+
+  @Patch(':id/score')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update match score' })
+  @ApiParam({ name: 'id', description: 'Match schedule ID', type: 'number' })
+  @ApiBody({ type: UpdateMatchScoreDto })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Match score updated successfully',
+    type: MatchScore 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Match or score not found' 
+  })
+  updateScore(
+    @Param('id', ParseIntPipe) id: number, 
+    @Body() updateMatchScoreDto: UpdateMatchScoreDto
+  ): Promise<MatchScore> {
+    return this.matchScheduleService.updateScore(id, updateMatchScoreDto);
+  }
+
+  @Delete(':id/score')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete match score' })
+  @ApiParam({ name: 'id', description: 'Match schedule ID', type: 'number' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Match score deleted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Match or score not found' 
+  })
+  removeScore(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+    return this.matchScheduleService.removeScore(id);
+  }
 }
+  

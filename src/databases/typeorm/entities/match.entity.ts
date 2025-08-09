@@ -1,13 +1,20 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Club } from "./club.entity";
 import { League } from "./league.entity";
 import { Stadium } from "./stadium.entity";
+import { MatchScore } from "./match-score.entity";
 
 export enum MatchStatus {
-    PENDING = 'pending',
-    IN_PROGRESS = 'in_progress',
-    COMPLETED = 'completed',
+    SCHEDULED = 'scheduled',
+    LIVE = 'live',
+    HALF_TIME = 'half_time',
+    FINISHED = 'finished',
+    POSTPONED = 'postponed',
     CANCELLED = 'cancelled',
+    ABANDONED = 'abandoned',
+    EXTRA_TIME = 'extra_time',
+    PENALTY_SHOOTOUT = 'penalty_shootout',
+    AWARDED = 'awarded',
 }
 
 @Entity('matches')
@@ -22,16 +29,13 @@ export class Match extends BaseEntity {
     @Column()
     clubId: number;
 
-    @Column()
-    clubScore: number;
-
     @ManyToOne(() => League)
     @JoinColumn({ name: 'clubLeagueId' })
     clubLeague: League;
 
     @ManyToOne(() => League)
     @JoinColumn({ name: 'clubSubLeagueId' })
-    clubSubLeague: League; 
+    clubSubLeague: League;
 
     @Column()
     clubLeagueId: number;
@@ -42,9 +46,6 @@ export class Match extends BaseEntity {
 
     @Column()
     opponentClubId: number;
-
-    @Column()
-    opponentClubScore: number;
 
     @ManyToOne(() => League)
     @JoinColumn({ name: 'opponentLeagueId' })
@@ -72,9 +73,12 @@ export class Match extends BaseEntity {
     @Column({
         type: 'enum',
         enum: MatchStatus,
-        default: MatchStatus.PENDING,
+        default: MatchStatus.SCHEDULED,
     })
     status: MatchStatus;
+
+    @OneToMany(() => MatchScore, (matchScore) => matchScore.match)
+    matchScores: MatchScore[];
 
     @CreateDateColumn()
     createdAt: Date;

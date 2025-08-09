@@ -7,12 +7,13 @@ config();
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
-  url: process.env.DATABASE_URL,
+  // url: process.env.DATABASE_URL,
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432', 10),
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   entities: [
     path.join(__dirname, '..', '..', '**', '*.entity{.ts,.js}'),
   ],
@@ -35,5 +36,6 @@ dataSource
   })
   .catch((err) => {
     console.error('Error during Data Source initialization', err)
+    process.exit(1)
   })
 export default dataSource;  

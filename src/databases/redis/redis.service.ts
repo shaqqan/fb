@@ -7,13 +7,12 @@ import { redisConfig } from 'src/common/configs';
 export class RedisService implements OnModuleDestroy, OnApplicationBootstrap, OnApplicationShutdown {
   private redisClient: Redis;
 
-  private readonly prefix = 'kitob_uz_';
+  private readonly prefix = 'fb_';
   private readonly defaultTTL = 3600; // 1 hour default TTL
 
   constructor(private readonly configService: ConfigService) { }
   onApplicationBootstrap() {
     const config = this.configService.getOrThrow<ConfigType<typeof redisConfig>>('redis');
-    console.log(config);
     this.redisClient = new Redis({
       host: config.host || 'localhost',
       port: config.port || 6379,
