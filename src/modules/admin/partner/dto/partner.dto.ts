@@ -1,80 +1,71 @@
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { PartnerStatus } from '../../../../databases/typeorm/entities';
-import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-
-export class JsonContentDto {
-    @ApiProperty()
-    @IsString()
-    ru: string;
-
-    @ApiProperty()
-    @IsString()
-    en: string;
-
-    @ApiProperty()
-    @IsString()
-    qq: string;
-
-    @ApiProperty()
-    @IsString()
-    kk: string;
-
-    @ApiProperty()
-    @IsString()
-    uz: string;
-
-    @ApiProperty()
-    @IsString()
-    oz: string;
-}
+import { Type } from 'class-transformer';
+import { 
+  IsNotEmpty, 
+  IsString, 
+  IsEmail, 
+  ValidateNested, 
+  IsOptional, 
+  IsEnum,
+  MaxLength 
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { MultiLocaleDto } from 'src/common/dto/multi-locale.dto';
+import { PartnerStatus } from 'src/databases/typeorm/entities/enums';
 
 export class CreatePartnerDto {
-    @ApiProperty({ 
-        description: 'Partner name',
-        example: 'Football Club Barcelona'
-    })
-    @IsString()
-    name: string;
-
-    @ApiProperty({ 
-        description: 'Partner description in multiple languages',
-        type: JsonContentDto 
+    @ApiProperty({
+        description: 'Partner name in multiple languages',
+        type: MultiLocaleDto
     })
     @ValidateNested()
-    @Type(() => JsonContentDto)
-    description: JsonContentDto;
+    @Type(() => MultiLocaleDto)
+    name: MultiLocaleDto;
 
-    @ApiProperty({ 
+    @ApiProperty({
+        description: 'Partner description in multiple languages',
+        type: MultiLocaleDto
+    })
+    @ValidateNested()
+    @Type(() => MultiLocaleDto)
+    description: MultiLocaleDto;
+
+    @ApiProperty({
         description: 'Partner logo/image URL',
-        example: '/uploads/partner-logo.png'
+        example: '/uploads/partner-logo.png',
+        maxLength: 255
     })
     @IsString()
+    @MaxLength(255)
     image: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Partner contact phone number',
-        example: '+998901234567'
+        example: '+998901234567',
+        maxLength: 20
     })
     @IsString()
+    @MaxLength(20)
     phone: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Partner contact email',
-        example: 'contact@partner.com'
+        example: 'contact@partner.com',
+        maxLength: 100
     })
-    @IsString()
+    @IsEmail()
+    @MaxLength(100)
     email: string;
 }
 
 export class UpdatePartnerDto extends PartialType(CreatePartnerDto) {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Partner status',
         enum: PartnerStatus,
         example: PartnerStatus.ACTIVE,
         required: false
     })
     @IsOptional()
-    status?: PartnerStatus;
+    @IsEnum(PartnerStatus)
+    status?: PartnerStatus = PartnerStatus.ACTIVE;
 }

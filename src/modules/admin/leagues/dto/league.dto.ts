@@ -1,48 +1,35 @@
-import { IsString, ValidateNested, IsOptional, IsNumber, IsPositive } from 'class-validator';
-import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-
-export class JsonContentDto {
-    @ApiProperty({ description: 'Content in Russian', example: 'Чемпионат России' })
-    @IsString()
-    ru: string;
-
-    @ApiProperty({ description: 'Content in English', example: 'Russian Championship' })
-    @IsString()
-    en: string;
-
-    @ApiProperty({ description: 'Content in Qara-Qalpaq', example: 'Qaraqalpaq čempionatı' })
-    @IsString()
-    qq: string;
-
-    @ApiProperty({ description: 'Content in Kazakh', example: 'Ресей чемпионаты' })
-    @IsString()
-    kk: string;
-
-    @ApiProperty({ description: 'Content in Uzbek (Latin)', example: 'Rossiya chempionati' })
-    @IsString()
-    uz: string;
-
-    @ApiProperty({ description: 'Content in Uzbek (Cyrillic)', example: 'Россия чемпионати' })
-    @IsString()
-    oz: string;
-}
+import { Type } from 'class-transformer';
+import { 
+  IsNotEmpty, 
+  IsString, 
+  IsNumber, 
+  IsOptional, 
+  ValidateNested, 
+  IsPositive,
+  MaxLength 
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { MultiLocaleDto } from 'src/common/dto/multi-locale.dto';
+import { Exists } from 'src/common/decorators/validators';
+import { League } from 'src/databases/typeorm/entities';
 
 export class CreateLeagueDto {
     @ApiProperty({ 
         description: 'League title in multiple languages',
-        type: JsonContentDto 
+        type: MultiLocaleDto 
     })
     @ValidateNested()
-    @Type(() => JsonContentDto)
-    title: JsonContentDto;
+    @Type(() => MultiLocaleDto)
+    title: MultiLocaleDto;
 
     @ApiProperty({ 
         description: 'League logo URL',
-        example: '/uploads/league-logo.png'
+        example: '/uploads/league-logo.png',
+        maxLength: 255
     })
     @IsString()
+    @MaxLength(255)
     logo: string;
 
     @ApiProperty({ 
@@ -54,6 +41,7 @@ export class CreateLeagueDto {
     @IsOptional()
     @IsNumber()
     @IsPositive()
+    @Exists(League, 'id')
     parentLeagueId?: number;
 }
 

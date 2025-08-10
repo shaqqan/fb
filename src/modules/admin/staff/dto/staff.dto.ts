@@ -1,87 +1,84 @@
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { StaffStatus } from '../../../../databases/typeorm/entities';
-import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-
-export class JsonContentDto {
-    @ApiProperty()
-    @IsString()
-    ru: string;
-
-    @ApiProperty()
-    @IsString()
-    en: string;
-
-    @ApiProperty()
-    @IsString()
-    qq: string;
-
-    @ApiProperty()
-    @IsString()
-    kk: string;
-
-    @ApiProperty()
-    @IsString()
-    uz: string;
-
-    @ApiProperty()
-    @IsString()
-    oz: string;
-}
+import { Type } from 'class-transformer';
+import { 
+  IsNotEmpty, 
+  IsString, 
+  IsEmail, 
+  ValidateNested, 
+  IsOptional, 
+  IsEnum,
+  MaxLength 
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { MultiLocaleDto } from 'src/common/dto/multi-locale.dto';
+import { StaffStatus } from 'src/databases/typeorm/entities/enums';
 
 export class CreateStaffDto {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Full name of the staff member',
-        example: 'John Doe'
+        example: 'John Doe',
+        maxLength: 100
     })
+    @IsNotEmpty()
     @IsString()
+    @MaxLength(100)
     fullname: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Position/role of the staff member',
-        example: 'Head Coach'
+        example: 'Head Coach',
+        maxLength: 100
     })
+    @IsNotEmpty()
     @IsString()
+    @MaxLength(100)
     position: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Staff member information/bio in multiple languages',
-        type: JsonContentDto 
+        type: MultiLocaleDto
     })
     @ValidateNested()
-    @Type(() => JsonContentDto)
-    information: JsonContentDto;
+    @Type(() => MultiLocaleDto)
+    information: MultiLocaleDto;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Staff member photo URL',
-        example: '/uploads/staff-photo.jpg'
+        example: '/uploads/staff-photo.jpg',
+        maxLength: 255
     })
     @IsString()
+    @MaxLength(255)
     image: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Staff member contact phone number',
-        example: '+998901234567'
+        example: '+998901234567',
+        maxLength: 20
     })
     @IsString()
+    @MaxLength(20)
     phone: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Staff member contact email',
-        example: 'john.doe@club.com'
+        example: 'john.doe@club.com',
+        maxLength: 100
     })
     @IsString()
+    @IsEmail()
+    @MaxLength(100)
     email: string;
 }
 
 export class UpdateStaffDto extends PartialType(CreateStaffDto) {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Staff member status',
         enum: StaffStatus,
         example: StaffStatus.ACTIVE,
         required: false
     })
     @IsOptional()
-    status?: StaffStatus;
+    @IsEnum(StaffStatus)
+    status?: StaffStatus = StaffStatus.ACTIVE;
 }
