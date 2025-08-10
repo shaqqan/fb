@@ -1,59 +1,45 @@
-import { IsArray, IsDateString, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { NewsStatus } from '../../../../databases/typeorm/entities';
-import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-
-export class JsonContentDto {
-    @ApiProperty({ description: 'Content in Russian', example: 'Новость на русском языке' })
-    @IsString()
-    ru: string;
-
-    @ApiProperty({ description: 'Content in English', example: 'News in English' })
-    @IsString()
-    en: string;
-
-    @ApiProperty({ description: 'Content in Qara-Qalpaq', example: 'Qaraqalpaq tilinde jaŋalıq' })
-    @IsString()
-    qq: string;
-
-    @ApiProperty({ description: 'Content in Kazakh', example: 'Қазақ тіліндегі жаңалық' })
-    @IsString()
-    kk: string;
-
-    @ApiProperty({ description: 'Content in Uzbek (Latin)', example: 'O\'zbek tilida yangilik' })
-    @IsString()
-    uz: string;
-
-    @ApiProperty({ description: 'Content in Uzbek (Cyrillic)', example: 'Ўзбек тилида янгилик' })
-    @IsString()
-    oz: string;
-}
+import { Type } from 'class-transformer';
+import { 
+  IsNotEmpty, 
+  IsString, 
+  IsArray, 
+  IsDateString, 
+  IsEnum, 
+  IsOptional, 
+  ValidateNested,
+  MaxLength 
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { MultiLocaleDto } from 'src/common/dto/multi-locale.dto';
+import { NewsStatus } from 'src/databases/typeorm/entities/enums';
 
 export class CreateNewsDto {
     @ApiProperty({
         description: 'News title in multiple languages',
-        type: JsonContentDto
+        type: MultiLocaleDto
     })
     @ValidateNested()
-    @Type(() => JsonContentDto)
-    title: JsonContentDto;
+    @Type(() => MultiLocaleDto)
+    title: MultiLocaleDto;
 
     @ApiProperty({
         description: 'News description/content in multiple languages',
-        type: JsonContentDto
+        type: MultiLocaleDto
     })
     @ValidateNested()
-    @Type(() => JsonContentDto)
-    description: JsonContentDto;
+    @Type(() => MultiLocaleDto)
+    description: MultiLocaleDto;
 
     @ApiProperty({
         description: 'Array of image URLs',
         example: ['/uploads/image1.jpg', '/uploads/image2.png'],
-        type: [String]
+        type: [String],
+        maxLength: 255
     })
     @IsArray()
     @IsString({ each: true })
+    @MaxLength(255, { each: true })
     images: string[];
 
     @ApiProperty({
@@ -73,7 +59,7 @@ export class CreateNewsDto {
     })
     @IsEnum(NewsStatus)
     @IsOptional()
-    status?: NewsStatus;
+    status?: NewsStatus = NewsStatus.DRAFT;
 }
 
 export class UpdateNewsDto extends PartialType(CreateNewsDto) { }

@@ -1,23 +1,36 @@
-import { IsNotEmpty, IsString, IsObject, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { League } from 'src/databases/typeorm/entities';
+import { Type } from 'class-transformer';
+import { 
+  IsNotEmpty, 
+  IsString, 
+  IsNumber, 
+  ValidateNested, 
+  IsOptional, 
+  IsObject,
+  MaxLength 
+} from 'class-validator';
 import { Exists } from 'src/common/decorators/validators';
+import { MultiLocaleDto } from 'src/common/dto/multi-locale.dto';
+import { League } from 'src/databases/typeorm/entities';
 
 export class CreateClubDto {
   @ApiProperty({
     description: 'Club name in multiple languages',
-    example: { en: 'Manchester United', uz: 'Manchester Yunayted' }
+    type: MultiLocaleDto
   })
   @IsNotEmpty()
-  @IsObject()
-  name: any;
+  @ValidateNested()
+  @Type(() => MultiLocaleDto)
+  name: MultiLocaleDto;
 
   @ApiProperty({
     description: 'Club logo Path',
-    example: 'logo.png'
+    example: 'logo.png',
+    maxLength: 255
   })
   @IsNotEmpty()
   @IsString()
+  @MaxLength(255)
   logo: string;
 
   @ApiProperty({
