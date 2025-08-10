@@ -1,4 +1,4 @@
-import { IsArray, IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { NewsStatus } from '../../../../databases/typeorm/entities';
 import { PartialType } from '@nestjs/mapped-types';
@@ -31,24 +31,24 @@ export class JsonContentDto {
 }
 
 export class CreateNewsDto {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'News title in multiple languages',
-        type: JsonContentDto 
+        type: JsonContentDto
     })
     @ValidateNested()
     @Type(() => JsonContentDto)
     title: JsonContentDto;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'News description/content in multiple languages',
-        type: JsonContentDto 
+        type: JsonContentDto
     })
     @ValidateNested()
     @Type(() => JsonContentDto)
     description: JsonContentDto;
 
-    @ApiProperty({ 
-        description: 'Array of image URLs', 
+    @ApiProperty({
+        description: 'Array of image URLs',
         example: ['/uploads/image1.jpg', '/uploads/image2.png'],
         type: [String]
     })
@@ -56,7 +56,7 @@ export class CreateNewsDto {
     @IsString({ each: true })
     images: string[];
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Scheduled publish date (ISO string). If not provided, will be published immediately',
         example: '2024-12-25T10:00:00.000Z',
         required: false
@@ -65,12 +65,13 @@ export class CreateNewsDto {
     @IsDateString()
     publishedAt?: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'News status',
         enum: NewsStatus,
         example: NewsStatus.DRAFT,
         required: false
     })
+    @IsEnum(NewsStatus)
     @IsOptional()
     status?: NewsStatus;
 }

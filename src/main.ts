@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ValidationPipe } from '@nestjs/common';
+import { HttpStatus, UnprocessableEntityException, ValidationPipe } from '@nestjs/common';
 import * as compression from 'compression';
 import { join } from 'path';
 import { setupSwaggerAdmin } from './common/swagger';
@@ -14,6 +14,16 @@ async function bootstrap() {
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,
+    exceptionFactory: (errors) => {
+      const formattedErrors = errors.reduce((acc, { property, constraints }) => {
+        acc[property] = Object.values(constraints || {});
+        return acc;
+      }, {});
+      return new UnprocessableEntityException({
+        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: formattedErrors,
+      });
+    }
   }));
 
   // Enable CORS
