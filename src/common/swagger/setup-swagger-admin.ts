@@ -12,7 +12,6 @@ export const setupSwaggerAdmin = (app: INestApplication): void => {
         .setLicense('Proprietary License', 'https://footballboard.uz')
         .addServer('https://api.kkfa.uz', 'Production Server')
         .addServer('http://127.0.0.1:' + process.env.PORT, 'Local Development Server')
-        .addServer('http://95.182.119.11:3002', 'Server')
         .addGlobalParameters({
             name: 'x-lang',
             in: 'header',
