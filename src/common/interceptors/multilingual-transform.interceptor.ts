@@ -1,74 +1,83 @@
-import { 
-  Injectable, 
-  NestInterceptor, 
-  ExecutionContext, 
-  CallHandler 
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { currentLocale } from '../utils/current-locale.util';
-
-interface MultilingualField {
-  [key: string]: string;
-}
+import { currentLocale } from '../utils/locale.util';
 
 @Injectable()
 export class MultilingualTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map(data => {
-        if (!data) return data;
-
-        // Handle paginated responses
-        if (data.data && Array.isArray(data.data)) {
-          data.data = data.data.map(item => this.transformItem(item, true));
-          return data;
+      map((data) => {
+        // Only transform pagination responses
+        if (this.isPaginationResponse(data)) {
+          return this.transformPaginationData(data);
         }
-
-        // Handle array responses
-        if (Array.isArray(data)) {
-          return data.map(item => this.transformItem(item, true));
-        }
-
-        // Handle single item responses
-        return this.transformItem(data, false);
-      })
+        return data;
+      }),
     );
   }
 
-  private transformItem(item: any, isPaginated: boolean): any {
-    if (typeof item !== 'object' || item === null) return item;
+  private isPaginationResponse(data: any): boolean {
+    return data && 
+           typeof data === 'object' && 
+           'data' in data && 
+           'meta' in data && 
+           'links' in data &&
+           Array.isArray(data.data);
+  }
 
-    const transformedItem = { ...item };
+  private transformPaginationData(data: any): any {
+    const currentLang = currentLocale();
+    
+    return {
+      ...data,
+      data: data.data.map((item: any) => this.transformMultilingualProperties(item, currentLang))
+    };
+  }
 
-    Object.keys(transformedItem).forEach(key => {
-      const value = transformedItem[key];
-      
-      // Check if the field is a multilingual object
-      if (this.isMultilingualField(value)) {
-        if (isPaginated) {
-          // For paginated responses, return only the current locale
-          transformedItem[key] = value[currentLocale()] || value['uz'];
-        } else {
-          // For single item responses, keep the full multilingual object
-          transformedItem[key] = value;
+  private transformMultilingualProperties(item: any, currentLang: string): any {
+    if (!item || typeof item !== 'object') {
+      return item;
+    }
+
+    const transformed = { ...item };
+
+    // List of known multilingual properties
+    const multilingualProps = [
+      'title', 'description', 'name', 'fullName', 'position', 
+      'information', 'content', 'summary', 'subtitle'
+    ];
+
+    for (const prop of multilingualProps) {
+      if (transformed[prop] && typeof transformed[prop] === 'object') {
+        // Check if it's a multilingual object
+        if (this.isMultilingualObject(transformed[prop])) {
+          // Get the value for current language, fallback to 'uz' if not found
+          transformed[prop] = transformed[prop][currentLang] || transformed[prop]['uz'] || '';
         }
-      } else if (typeof value === 'object' && value !== null) {
-        // Recursively transform nested objects
-        transformedItem[key] = this.transformItem(value, isPaginated);
       }
-    });
+    }
 
-    return transformedItem;
+    // Recursively transform nested objects
+    for (const key in transformed) {
+      if (transformed[key] && typeof transformed[key] === 'object' && !Array.isArray(transformed[key])) {
+        transformed[key] = this.transformMultilingualProperties(transformed[key], currentLang);
+      }
+    }
+
+    return transformed;
   }
 
-  private isMultilingualField(value: any): boolean {
-    return (
-      typeof value === 'object' && 
-      value !== null && 
-      Object.keys(value).every(key => 
-        ['ru', 'en', 'kk', 'kk_k', 'uz', 'uz_k'].includes(key)
-      )
-    );
+  private isMultilingualObject(obj: any): boolean {
+    if (!obj || typeof obj !== 'object') return false;
+    
+    // Check if it has multilingual language keys
+    const langKeys = ['uz', 'ru', 'en', 'kk', 'kk_k', 'uz_k'];
+    return langKeys.some(key => key in obj);
   }
 }
