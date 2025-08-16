@@ -17,5 +17,13 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/i18n/**/*.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

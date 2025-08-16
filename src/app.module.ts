@@ -14,6 +14,13 @@ import { ModulesModule } from './modules/modules.module';
 import { TasksService } from './tasks.service';
 import { News } from './databases/typeorm/entities';
 
+const i18nPath = path.join(
+  process.env.NODE_ENV === 'production' 
+    ? path.join(process.cwd(), 'dist', 'i18n') 
+    : path.join(__dirname, 'i18n'),
+  ''
+);
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,8 +32,8 @@ import { News } from './databases/typeorm/entities';
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
-        path: path.join(__dirname, '/i18n/'),
-        watch: true,
+        path: i18nPath,
+        watch: process.env.NODE_ENV !== 'production',
       },
       loader: I18nJsonLoader,
     }),
