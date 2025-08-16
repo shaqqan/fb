@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
+import { ConfigModule, ConfigType, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,13 +13,6 @@ import { DatabasesModule } from './databases/databases.module';
 import { ModulesModule } from './modules/modules.module';
 import { TasksService } from './tasks.service';
 import { News } from './databases/typeorm/entities';
-
-const i18nPath = path.join(
-  process.env.NODE_ENV === 'production'
-    ? path.join(process.cwd(), 'dist', 'i18n')
-    : path.join(__dirname, 'i18n'),
-  ''
-);
 
 @Module({
   imports: [
