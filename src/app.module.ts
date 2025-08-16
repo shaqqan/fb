@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { I18nModule, I18nJsonLoader } from 'nestjs-i18n';
+import * as path from 'path';
 
 import { AtGuard } from './common/guards';
+import { MultilingualTransformInterceptor } from './common/interceptors/multilingual-transform.interceptor';
 import { appConfig, jwtConfig, typeormConfig, redisConfig } from './common/configs';
 import { DatabasesModule } from './databases/databases.module';
 import { ModulesModule } from './modules/modules.module';
@@ -19,6 +22,14 @@ import { News } from './databases/typeorm/entities';
       envFilePath: '.env',
       load: [appConfig, jwtConfig, typeormConfig, redisConfig],
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      loader: I18nJsonLoader,
+    }),
     ScheduleModule.forRoot(),
     DatabasesModule,
     ModulesModule,
@@ -28,6 +39,10 @@ import { News } from './databases/typeorm/entities';
     {
       provide: APP_GUARD,
       useClass: AtGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MultilingualTransformInterceptor,
     },
     TasksService,
   ],

@@ -1,0 +1,8 @@
+{
+  "welcome": "Welcome to our application!",
+  "greeting": "Hello, {{name}}!",
+  "error": {
+    "notFound": "Resource not found",
+    "unauthorized": "Unauthorized access"
+  }
+}
