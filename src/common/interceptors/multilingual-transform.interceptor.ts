@@ -23,17 +23,17 @@ export class MultilingualTransformInterceptor implements NestInterceptor {
   }
 
   private isPaginationResponse(data: any): boolean {
-    return data && 
-           typeof data === 'object' && 
-           'data' in data && 
-           'meta' in data && 
-           'links' in data &&
-           Array.isArray(data.data);
+    return data &&
+      typeof data === 'object' &&
+      'data' in data &&
+      'meta' in data &&
+      'links' in data &&
+      Array.isArray(data.data);
   }
 
   private transformPaginationData(data: any): any {
     const currentLang = currentLocale();
-    
+
     return {
       ...data,
       data: data.data.map((item: any) => this.transformMultilingualProperties(item, currentLang))
@@ -49,7 +49,7 @@ export class MultilingualTransformInterceptor implements NestInterceptor {
 
     // List of known multilingual properties
     const multilingualProps = [
-      'title', 'description', 'name', 'fullName', 'position', 
+      'title', 'description', 'name', 'fullName', 'position',
       'information', 'content', 'summary', 'subtitle'
     ];
 
@@ -65,8 +65,20 @@ export class MultilingualTransformInterceptor implements NestInterceptor {
 
     // Recursively transform nested objects
     for (const key in transformed) {
-      if (transformed[key] && typeof transformed[key] === 'object' && !Array.isArray(transformed[key])) {
-        transformed[key] = this.transformMultilingualProperties(transformed[key], currentLang);
+      if (
+        transformed[key] &&
+        typeof transformed[key] === 'object' &&
+        !Array.isArray(transformed[key])
+      ) {
+        // ✅ Skip Date objects
+        if (transformed[key] instanceof Date) {
+          continue;
+        }
+
+        transformed[key] = this.transformMultilingualProperties(
+          transformed[key],
+          currentLang,
+        );
       }
     }
 
@@ -75,7 +87,7 @@ export class MultilingualTransformInterceptor implements NestInterceptor {
 
   private isMultilingualObject(obj: any): boolean {
     if (!obj || typeof obj !== 'object') return false;
-    
+
     // Check if it has multilingual language keys
     const langKeys = ['uz', 'ru', 'en', 'kk', 'kk_k', 'uz_k'];
     return langKeys.some(key => key in obj);
