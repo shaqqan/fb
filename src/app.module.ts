@@ -22,31 +22,17 @@ import { join } from 'path';
       envFilePath: '.env',
       load: [appConfig, jwtConfig, typeormConfig, redisConfig, I18nConfig],
     }),
-    I18nModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const i18nConfig = configService.get('i18n');
-
-        if (!i18nConfig) {
-          throw new Error('I18n configuration not found');
-        }
-
-        if (!i18nConfig.loaderOptions?.path) {
-          throw new Error('I18n loaderOptions.path is not configured');
-        }
-
-        return {
-          fallbackLanguage: i18nConfig.fallbackLanguage,
-          loaderOptions: {
-            path: join(process.cwd(), i18nConfig.loaderOptions.path),
-            watch: i18nConfig.loaderOptions.watch || false,
-          },
-          resolvers: [
-            new HeaderResolver(['x-lang']),
-          ],
-        };
+    I18nModule.forRoot({
+      fallbackLanguage: 'uz',
+      loaderOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
       },
+      resolvers: [
+        new HeaderResolver(['x-lang']),
+        new QueryResolver(['lang', 'locale', 'l']),
+        new AcceptLanguageResolver(),
+      ],
     }),
     ScheduleModule.forRoot(),
     DatabasesModule,
