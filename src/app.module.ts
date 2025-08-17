@@ -8,7 +8,7 @@ import * as path from 'path';
 
 import { AtGuard } from './common/guards';
 import { MultilingualTransformInterceptor } from './common/interceptors';
-import { appConfig, jwtConfig, typeormConfig, redisConfig, i18nConfig, I18nConfig } from './common/configs';
+import { appConfig, jwtConfig, typeormConfig, redisConfig, I18nConfig } from './common/configs';
 import { DatabasesModule } from './databases/databases.module';
 import { ModulesModule } from './modules/modules.module';
 import { TasksService } from './tasks.service';
