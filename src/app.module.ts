@@ -3,8 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { I18nModule, I18nJsonLoader, I18nLoader } from 'nestjs-i18n';
-import * as path from 'path';
+import { I18nModule } from 'nestjs-i18n';
 
 import { AtGuard } from './common/guards';
 import { MultilingualTransformInterceptor } from './common/interceptors';
