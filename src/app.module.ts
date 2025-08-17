@@ -45,8 +45,6 @@ import { join } from 'path';
             watch: i18nConfig.loaderOptions.watch || false,
           },
           resolvers: [
-            { use: QueryResolver, options: ['lang'] },
-            AcceptLanguageResolver,
             new HeaderResolver(['x-lang']),
           ],
         };
