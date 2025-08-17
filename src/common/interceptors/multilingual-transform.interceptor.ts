@@ -34,6 +34,8 @@ export class MultilingualTransformInterceptor implements NestInterceptor {
   private transformPaginationData(data: any): any {
     const currentLang = currentLocale();
 
+    console.log('currentLang', currentLang);
+
     return {
       ...data,
       data: data.data.map((item: any) => this.transformMultilingualProperties(item, currentLang))
