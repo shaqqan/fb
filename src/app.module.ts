@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { I18nModule } from 'nestjs-i18n';
+import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 
 import { AtGuard } from './common/guards';
 import { MultilingualTransformInterceptor } from './common/interceptors';
@@ -27,14 +27,28 @@ import { join } from 'path';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const i18nConfig = configService.get('i18n');
+
+        if (!i18nConfig) {
+          throw new Error('I18n configuration not found');
+        }
+
+        if (!i18nConfig.loaderOptions?.path) {
+          throw new Error('I18n loaderOptions.path is not configured');
+        }
+
         return {
-          fallbackLanguage: i18nConfig.fallbackLanguage,
-          fallbacks: i18nConfig.fallbacks,
+          fallbackLanguage: i18nConfig.fallbackLanguage || 'uz',
+          fallbacks: i18nConfig.fallbacks || { 'uz': 'uz' },
           typesOutputPath: i18nConfig.typesOutputPath,
           loaderOptions: {
             path: join(process.cwd(), i18nConfig.loaderOptions.path),
-            watch: i18nConfig.loaderOptions.watch,
+            watch: i18nConfig.loaderOptions.watch || false,
           },
+          resolvers: [
+            { use: QueryResolver, options: ['lang'] },
+            AcceptLanguageResolver,
+            new HeaderResolver(['x-lang']),
+          ],
         };
       },
     }),

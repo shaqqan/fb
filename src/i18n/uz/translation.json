@@ -1,0 +1,8 @@
+{
+  "welcome": "Ilovamizga xush kelibsiz!",
+  "greeting": "Salom, {{name}}!",
+  "error": {
+    "notFound": "Ma'lumot topilmadi",
+    "unauthorized": "Ruxsatsiz kirish"
+  }
+}
