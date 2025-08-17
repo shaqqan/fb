@@ -37,9 +37,7 @@ import { join } from 'path';
         }
 
         return {
-          fallbackLanguage: i18nConfig.fallbackLanguage || 'uz',
-          fallbacks: i18nConfig.fallbacks || { 'uz': 'uz' },
-          typesOutputPath: i18nConfig.typesOutputPath,
+          fallbackLanguage: i18nConfig.fallbackLanguage,
           loaderOptions: {
             path: join(process.cwd(), i18nConfig.loaderOptions.path),
             watch: i18nConfig.loaderOptions.watch || false,
