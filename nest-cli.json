@@ -9,20 +9,6 @@
         "include": "i18n/**/*",
         "watchAssets": true
       }
-    ],
-    "plugins": [
-      {
-        "name": "@nestjs/swagger/plugin",
-        "options": {
-          "dtoFileNameSuffix": [
-            ".entity.ts",
-            ".dto.ts"
-          ],
-          "controllerFileNameSuffix": [
-            ".controller.ts"
-          ]
-        }
-      }
     ]
   }
 }
