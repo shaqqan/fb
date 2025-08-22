@@ -25,6 +25,7 @@ export class LeaguesService {
 
         return await this.leagueRepository.save({
             ...data,
+            parentLeagueId: data.parentLeagueId ? { id: data.parentLeagueId } : null,
             title: data.title as any
         });
     }
@@ -157,7 +158,7 @@ export class LeaguesService {
     private async getAllDescendants(id: number): Promise<League[]> {
         const descendants: League[] = [];
         const children = await this.getChildren(id);
-        
+
         for (const child of children) {
             descendants.push(child);
             const childDescendants = await this.getAllDescendants(child.id);
