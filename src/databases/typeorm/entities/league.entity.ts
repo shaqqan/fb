@@ -24,6 +24,9 @@ export class League {
   @OneToMany(() => Club, (club) => club.league)
   clubs: Club[];
 
+  @Column({ nullable: true })
+  parentLeagueId: number;
+
   @ManyToOne(() => League)
   @JoinColumn({ name: 'parentLeagueId' })
   parentLeague: League;

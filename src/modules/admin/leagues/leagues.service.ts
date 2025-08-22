@@ -25,7 +25,7 @@ export class LeaguesService {
 
         return await this.leagueRepository.save({
             ...data,
-            parentLeagueId: data.parentLeagueId ? { id: data.parentLeagueId } : null,
+            parentLeagueId: data.parentLeagueId,
             title: data.title as any
         });
     }
