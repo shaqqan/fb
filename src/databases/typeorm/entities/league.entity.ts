@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  AfterLoad,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -37,9 +36,4 @@ export class League {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @AfterLoad()
-  setAssetToLogo() {
-    this.logo = `${process.env.BASE_URL}${this.logo}`;
-  }
 }

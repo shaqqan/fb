@@ -100,6 +100,9 @@ export class NewsService {
         const updateData: any = { ...data };
         if (data.title) updateData.title = data.title;
         if (data.description) updateData.description = data.description;
+        if (data.images) updateData.images = data.images;
+        if (data.publishedAt) updateData.publishedAt = data.publishedAt;
+        if (data.status) updateData.status = data.status;
 
         await this.newsRepository.update(id, updateData);
 
