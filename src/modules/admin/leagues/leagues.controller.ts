@@ -133,6 +133,55 @@ export class LeaguesController {
     }
 
     @Public()
+    @Get('sub-leagues')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get all sub-leagues with pagination' })
+    @ApiPaginationQuery({
+        sortableColumns: ['id', 'createdAt', 'updatedAt', 'title'],
+        searchableColumns: ['title'],
+        defaultSortBy: [['createdAt', 'DESC']],
+        defaultLimit: 10,
+        maxLimit: 100,
+    })
+    @ApiResponse({ 
+        status: 200, 
+        description: 'Paginated list of sub-leagues',
+        schema: {
+            type: 'object',
+            properties: {
+                data: { type: 'array', items: { $ref: '#/components/schemas/League' } },
+                meta: {
+                    type: 'object',
+                    properties: {
+                        itemsPerPage: { type: 'number' },
+                        totalItems: { type: 'number' },
+                        currentPage: { type: 'number' },
+                        totalPages: { type: 'number' },
+                        sortBy: { type: 'array' },
+                        searchBy: { type: 'array' },
+                        search: { type: 'string' },
+                        filter: { type: 'object' }
+                    }
+                },
+                links: {
+                    type: 'object',
+                    properties: {
+                        first: { type: 'string' },
+                        previous: { type: 'string' },
+                        current: { type: 'string' },
+                        next: { type: 'string' },
+                        last: { type: 'string' }
+                    }
+                }
+            }
+        }
+    })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    getSubLeagues(@Paginate() query: PaginateQuery): Promise<Paginated<League>> {
+        return this.leaguesService.getSubLeagues(query);
+    }
+
+    @Public()
     @Get(':id/children')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get child leagues of a specific league' })

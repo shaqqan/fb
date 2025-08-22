@@ -126,6 +126,24 @@ export class LeaguesService {
         return league;
     }
 
+    async getSubLeagues(query: PaginateQuery): Promise<Paginated<League>> {
+        const queryBuilder = this.leagueRepository
+            .createQueryBuilder('league')
+            .leftJoinAndSelect('league.parentLeague', 'parentLeague')
+            .leftJoinAndSelect('league.childLeagues', 'childLeagues')
+            .leftJoinAndSelect('league.clubs', 'clubs')
+            .where('league.parentLeague IS NOT NULL');
+
+        return paginate(query, queryBuilder, {
+            sortableColumns: ['id', 'createdAt', 'updatedAt', 'title'],
+            nullSort: 'last',
+            defaultSortBy: [['createdAt', 'DESC']],
+            searchableColumns: ['title'],
+            defaultLimit: 10,
+            maxLimit: 100,
+        });
+    }
+
     private async wouldCreateCircularReference(leagueId: number, parentLeagueId: number): Promise<boolean> {
         if (leagueId === parentLeagueId) {
             return true;

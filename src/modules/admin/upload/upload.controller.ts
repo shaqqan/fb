@@ -1,15 +1,17 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseInterceptors, Body, Delete, NotFoundException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { 
+import {
   ApiTags,
-  ApiBody, 
-  ApiConsumes, 
-  ApiOperation, 
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 @ApiTags('upload')
 @Controller('upload')
@@ -32,8 +34,8 @@ export class UploadController {
       required: ['file'],
     },
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'File uploaded successfully',
     schema: {
       type: 'object',
@@ -68,5 +70,52 @@ export class UploadController {
       filename: file.filename,
       path: `/uploads/${file.filename}`,
     };
+  }
+
+  @Delete('file')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a file from the server' })
+  @ApiBody({
+    description: 'File path to delete',
+    schema: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'Path of the file to delete (relative to uploads directory)',
+          example: 'uploads/1234567890-123456789.jpg'
+        }
+      },
+      required: ['path']
+    }
+  })
+  @ApiResponse({ status: 200, description: 'File deleted successfully' })
+  @ApiResponse({ status: 404, description: 'File not found' })
+  async deleteFile(@Body('path') filePath: string) {
+    // Ensure the path is within the uploads directory for security
+    const uploadsDir = path.resolve('./uploads');
+    const fullPath = path.resolve(filePath);
+
+    // Check if the file is within the uploads directory
+    if (!fullPath.startsWith(uploadsDir)) {
+      throw new NotFoundException('Invalid file path');
+    }
+
+    try {
+      // Check if file exists
+      await fs.access(fullPath);
+
+      // Delete the file
+      await fs.unlink(fullPath);
+
+      return { message: 'File deleted successfully' };
+    } catch (error) {
+      // If file doesn't exist, throw NotFoundException
+      if (error.code === 'ENOENT') {
+        throw new NotFoundException('File not found');
+      }
+      // Rethrow other errors
+      throw error;
+    }
   }
 }
