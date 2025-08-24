@@ -47,9 +47,14 @@ export class ClubService {
     const local = currentLocale();
 
     if (query.search) {
-      queryBuilder.andWhere(`club.name->${local} LIKE :search OR club.information->${local} LIKE :search`, {
-        search: `%${query.search}%`,
-      });
+      queryBuilder.andWhere(
+        `(club.name->>:locale LIKE :search OR club.information->>:locale LIKE :search)`,
+        {
+          search: `%${query.search}%`,
+          locale: local,
+          fallbackLocale: 'uz'
+        }
+      );
     }
 
     return paginate(query, queryBuilder, {
