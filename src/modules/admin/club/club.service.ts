@@ -5,6 +5,7 @@ import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
 import { Club } from 'src/databases/typeorm/entities';
+import { currentLocale } from 'src/common/utils';
 
 @Injectable()
 export class ClubService {
@@ -43,10 +44,7 @@ export class ClubService {
         'subLeague.title'
       ]);
 
-    if (query.search) {
-      queryBuilder.andWhere('club.name::TEXT ILIKE :search OR club.information::TEXT ILIKE :search', { search: `%${query.search}%` });
-    }
-
+    const local = currentLocale();
     return paginate(query, queryBuilder, {
       sortableColumns: ['id', 'createdAt', 'updatedAt'],
       nullSort: 'last',
@@ -55,6 +53,7 @@ export class ClubService {
         leagueId: true,
         subLeagueId: true,
       },
+      searchableColumns: [`name->${local}`, `information->${local}`],
       defaultLimit: 10,
       maxLimit: 100,
     });
