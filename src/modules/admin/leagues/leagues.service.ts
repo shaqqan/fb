@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreateLeagueDto, UpdateLeagueDto, SimplifiedLeagueDto } from './dto';
 import { League } from '../../../databases/typeorm/entities';
+import { currentLocale } from 'src/common/utils';
 
 @Injectable()
 export class LeaguesService {
@@ -89,7 +90,7 @@ export class LeaguesService {
         return league.parentLeague || null;
     }
 
-async getRootLeagues(query: PaginateQuery): Promise<Paginated<League>> {
+    async getRootLeagues(query: PaginateQuery): Promise<Paginated<League>> {
         const queryBuilder = this.leagueRepository
             .createQueryBuilder('league')
             .leftJoinAndSelect('league.childLeagues', 'childLeagues')
@@ -146,18 +147,30 @@ async getRootLeagues(query: PaginateQuery): Promise<Paginated<League>> {
     }
 
     async getSimpleLeagues(): Promise<SimplifiedLeagueDto[]> {
-        return await this.leagueRepository
+        const local = currentLocale()
+        const leagues = await this.leagueRepository
             .createQueryBuilder('league')
             .select(['league.id', 'league.title'])
+            .where('league.parentLeague IS NULL')
             .getMany();
+
+        return leagues.map(league => ({
+            id: league.id,
+            title: league.title[local]
+        }));
     }
 
     async getSimpleSubLeagues(): Promise<SimplifiedLeagueDto[]> {
-        return await this.leagueRepository
+        const local = currentLocale()
+        const leagues = await this.leagueRepository
             .createQueryBuilder('league')
             .select(['league.id', 'league.title'])
             .where('league.parentLeague IS NOT NULL')
             .getMany();
+        return leagues.map(league => ({
+            id: league.id,
+            title: league.title[local]
+        }));
     }
 
     private async wouldCreateCircularReference(leagueId: number, parentLeagueId: number): Promise<boolean> {

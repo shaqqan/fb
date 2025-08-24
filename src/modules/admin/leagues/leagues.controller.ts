@@ -85,7 +85,6 @@ export class LeaguesController {
         return this.leaguesService.getAll(query);
     }
 
-    @Public()
     @Get('roots')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get root leagues (top-level leagues without parents)' })
