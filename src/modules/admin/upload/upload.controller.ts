@@ -92,21 +92,12 @@ export class UploadController {
   @ApiResponse({ status: 200, description: 'File deleted successfully' })
   @ApiResponse({ status: 404, description: 'File not found' })
   async deleteFile(@Body('path') filePath: string) {
-    // Ensure the path is within the uploads directory for security
-    const uploadsDir = path.resolve('./uploads');
-    const fullPath = path.resolve(filePath);
-
-    // Check if the file is within the uploads directory
-    if (!fullPath.startsWith(uploadsDir)) {
-      throw new NotFoundException('Invalid file path');
-    }
-
     try {
       // Check if file exists
-      await fs.access(fullPath);
+      await fs.access(process.cwd() + '/uploads/' + filePath);
 
       // Delete the file
-      await fs.unlink(fullPath);
+      await fs.unlink(process.cwd() + '/uploads/' + filePath);
 
       return { message: 'File deleted successfully' };
     } catch (error) {
