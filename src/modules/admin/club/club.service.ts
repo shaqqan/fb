@@ -48,12 +48,11 @@ export class ClubService {
 
     if (query.search) {
       queryBuilder.andWhere(
-        `(club.name->>:locale LIKE :search OR club.information->>:locale LIKE :search)`,
-        {
-          search: `%${query.search}%`,
-          locale: local,
-          fallbackLocale: 'uz'
-        }
+        `(
+          CAST(club.name->>:locale AS text) ILIKE :search OR 
+          CAST(club.information->>:locale AS text) ILIKE :search
+        )`,
+        { search: `%${query.search}%`, locale: local }
       );
     }
 
