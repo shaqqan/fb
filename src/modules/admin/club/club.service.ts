@@ -45,6 +45,13 @@ export class ClubService {
       ]);
 
     const local = currentLocale();
+
+    if (query.search) {
+      queryBuilder.andWhere(`club.name->${local} LIKE :search OR club.information->${local} LIKE :search`, {
+        search: `%${query.search}%`,
+      });
+    }
+
     return paginate(query, queryBuilder, {
       sortableColumns: ['id', 'createdAt', 'updatedAt'],
       nullSort: 'last',
@@ -53,7 +60,6 @@ export class ClubService {
         leagueId: true,
         subLeagueId: true,
       },
-      searchableColumns: [`name->${local}`, `information->${local}`],
       defaultLimit: 10,
       maxLimit: 100,
     });
