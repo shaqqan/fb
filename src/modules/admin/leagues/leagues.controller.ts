@@ -9,7 +9,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
-import { CreateLeagueDto, UpdateLeagueDto } from './dto';
+import { CreateLeagueDto, UpdateLeagueDto, SimplifiedLeagueDto } from './dto';
 import { League } from '../../../databases/typeorm/entities';
 import { LeaguesService } from './leagues.service';
 import { Public } from 'src/common/decorators';
@@ -181,7 +181,30 @@ export class LeaguesController {
         return this.leaguesService.getSubLeagues(query);
     }
 
-    @Public()
+    @Get('list')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get all leagues with only id and title' })
+    @ApiResponse({ 
+        status: 200, 
+        description: 'List of leagues with id and title',
+        type: [SimplifiedLeagueDto]
+    })
+    getList(): Promise<SimplifiedLeagueDto[]> {
+        return this.leaguesService.getSimpleLeagues();
+    }
+
+    @Get('list/sub-leagues')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get all sub-leagues with only id and title' })
+    @ApiResponse({ 
+        status: 200, 
+        description: 'List of sub-leagues with id and title',
+        type: [SimplifiedLeagueDto]
+    })
+    getListSubLeagues(): Promise<SimplifiedLeagueDto[]> {
+        return this.leaguesService.getSimpleSubLeagues();
+    }
+
     @Get(':id/children')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get child leagues of a specific league' })
@@ -192,7 +215,6 @@ export class LeaguesController {
         return this.leaguesService.getChildren(+id);
     }
 
-    @Public()
     @Get(':id/parent')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get parent league of a specific league' })
@@ -212,7 +234,6 @@ export class LeaguesController {
         return this.leaguesService.getParent(+id);
     }
 
-    @Public()
     @Get(':id/hierarchy')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ 
