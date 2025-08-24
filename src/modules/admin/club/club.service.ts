@@ -44,7 +44,7 @@ export class ClubService {
       ]);
 
     if (query.search) {
-      queryBuilder.andWhere('club.name::TEXT ILIKE :search OR club.information::TEXT ILIKE :search OR league.title::TEXT ILIKE :search OR subLeague.title::TEXT ILIKE :search', { search: `%${query.search}%` });
+      queryBuilder.andWhere('club.name::TEXT ILIKE :search OR club.information::TEXT ILIKE :search', { search: `%${query.search}%` });
     }
 
     return paginate(query, queryBuilder, {
