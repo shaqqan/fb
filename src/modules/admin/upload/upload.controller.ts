@@ -94,8 +94,8 @@ export class UploadController {
   async deleteFile(@Body('path') filePath: string) {
     try {
       // Normalize and clean the file path
-      let cleanPath = '/' + filePath;
-      cleanPath = filePath.replace(/^\.\//, ''); // Remove leading ./
+      filePath = filePath.slice(1);
+      let cleanPath = filePath.replace(/^\.\//, ''); // Remove leading ./
       cleanPath = cleanPath.replace(/^uploads\//, ''); // Remove leading uploads/
 
       // Construct the full path safely
