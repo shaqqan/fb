@@ -10,8 +10,8 @@ import {
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import * as fs from 'fs/promises';
-import { join, normalize, relative } from 'path';
+import { join, relative } from 'path';
+import { promises as fs } from 'fs';
 
 @ApiTags('upload')
 @Controller('upload')
@@ -83,7 +83,7 @@ export class UploadController {
         path: {
           type: 'string',
           description: 'Path of the file to delete (relative to uploads directory)',
-          example: '1234567890-123456789.jpg'
+          example: '/uploads/1756045389359-719138785.jpg'
         }
       },
       required: ['path']
@@ -93,37 +93,36 @@ export class UploadController {
   @ApiResponse({ status: 404, description: 'File not found' })
   async deleteFile(@Body('path') filePath: string) {
     try {
-      // Normalize and clean the file path
-      filePath = filePath.slice(1);
-      let cleanPath = filePath.replace(/^\.\//, ''); // Remove leading ./
-      cleanPath = cleanPath.replace(/^uploads\//, ''); // Remove leading uploads/
+      // 1. Normalize path
+      // remove leading slash if exists + remove leading "uploads/"
+      let cleanPath = filePath.replace(/^\/?uploads\//, '');
+      cleanPath = cleanPath.replace(/^\.\//, ''); // remove "./" if exists
 
-      // Construct the full path safely
+      // 2. Construct the full path safely
       const uploadsDir = join(process.cwd(), 'uploads');
       const fullPath = join(uploadsDir, cleanPath);
 
-      // Security check: ensure the file is within the uploads directory
+      // 3. Security check: ensure the file is inside uploads dir
       const relativePath = relative(uploadsDir, fullPath);
       if (relativePath.startsWith('..') || relativePath.includes('..')) {
         throw new BadRequestException('Invalid file path');
       }
 
-      // Check if file exists
+      // 4. Check if file exists
       await fs.access(fullPath);
 
-      // Delete the file
+      // 5. Delete the file
       await fs.unlink(fullPath);
 
       return {
         message: 'File deleted successfully',
-        path: cleanPath
+        path: cleanPath,
       };
-    } catch (error) {
-      // If file doesn't exist, throw NotFoundException
+    } catch (error: any) {
+      // If file doesn't exist
       if (error.code === 'ENOENT') {
         throw new NotFoundException(`File not found: ${filePath}`);
       }
-      // Rethrow other errors
       throw error;
     }
   }
