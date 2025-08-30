@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsEmail, 
-  ValidateNested, 
+import {
+  IsNotEmpty,
+  IsString,
+  IsEmail,
+  ValidateNested,
   IsOptional,
-  MaxLength 
+  MaxLength
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { MultiLocaleDto } from 'src/common/dto/multi-locale.dto';
@@ -59,6 +59,15 @@ export class CreatePersonalDto {
   @IsEmail()
   @MaxLength(100)
   email: string;
+
+  @ApiProperty({
+    description: 'Avatar',
+    example: '/uploads/avatar.jpg',
+    maxLength: 255
+  })
+  @IsString()
+  @MaxLength(255)
+  avatar: string;
 }
 
 export class UpdatePersonalDto extends PartialType(CreatePersonalDto) { }

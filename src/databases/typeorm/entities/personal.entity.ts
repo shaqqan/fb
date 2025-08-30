@@ -22,6 +22,9 @@ export class Personal extends BaseEntity {
     @Column()
     email: string
 
+    @Column()
+    avatar: string
+
     @CreateDateColumn()
     createdAt: Date
 

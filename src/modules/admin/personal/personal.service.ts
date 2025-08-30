@@ -11,17 +11,11 @@ export class PersonalService {
   constructor(
     @InjectRepository(Personal)
     private personalRepository: Repository<Personal>,
-  ) {}
+  ) { }
 
   async create(createPersonalDto: CreatePersonalDto): Promise<Personal> {
-    const personal = new Personal();
-    personal.fullName = createPersonalDto.fullName;
-    personal.position = createPersonalDto.position;
-    personal.information = createPersonalDto.information;
-    personal.phone = createPersonalDto.phone;
-    personal.email = createPersonalDto.email;
-
-    return await this.personalRepository.save(personal);
+    const create = this.personalRepository.create(createPersonalDto);
+    return await create.save();
   }
 
   async findAll(query: PaginateQuery): Promise<Paginated<Personal>> {
@@ -35,22 +29,23 @@ export class PersonalService {
         'personal.phone',
         'personal.email',
         'personal.createdAt',
-        'personal.updatedAt'
+        'personal.updatedAt',
+        'personal.avatar'
       ]);
 
     // Apply custom filters
     if (query.filter) {
       // Date range filters
       if (query.filter.createdAtStart) {
-        const startDateValue = Array.isArray(query.filter.createdAtStart) 
-          ? query.filter.createdAtStart[0] 
+        const startDateValue = Array.isArray(query.filter.createdAtStart)
+          ? query.filter.createdAtStart[0]
           : query.filter.createdAtStart;
         const startDate = new Date(startDateValue);
         queryBuilder.andWhere('personal.createdAt >= :createdAtStart', { createdAtStart: startDate });
       }
       if (query.filter.createdAtEnd) {
-        const endDateValue = Array.isArray(query.filter.createdAtEnd) 
-          ? query.filter.createdAtEnd[0] 
+        const endDateValue = Array.isArray(query.filter.createdAtEnd)
+          ? query.filter.createdAtEnd[0]
           : query.filter.createdAtEnd;
         const endDate = new Date(endDateValue);
         queryBuilder.andWhere('personal.createdAt <= :createdAtEnd', { createdAtEnd: endDate });
@@ -109,14 +104,14 @@ export class PersonalService {
     const updateData: any = { ...updatePersonalDto };
 
     await this.personalRepository.update(id, updateData);
-    
+
     return await this.findOne(id);
   }
 
   async remove(id: number): Promise<{ message: string }> {
     const personal = await this.findOne(id);
     await this.personalRepository.remove(personal);
-    
+
     return { message: `Personal with ID ${id} has been successfully deleted` };
   }
 }
