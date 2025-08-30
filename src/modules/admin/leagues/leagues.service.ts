@@ -5,6 +5,7 @@ import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreateLeagueDto, UpdateLeagueDto, SimplifiedLeagueDto } from './dto';
 import { League } from '../../../databases/typeorm/entities';
 import { currentLocale } from 'src/common/utils';
+import { SubLeagueListDto } from './dto/sub-league-list.dto';
 
 @Injectable()
 export class LeaguesService {
@@ -160,14 +161,18 @@ export class LeaguesService {
         }));
     }
 
-    async getSimpleSubLeagues(): Promise<SimplifiedLeagueDto[]> {
+    async getSimpleSubLeagues(query: SubLeagueListDto): Promise<SimplifiedLeagueDto[]> {
         const local = currentLocale()
         const leagues = await this.leagueRepository
             .createQueryBuilder('league')
             .select(['league.id', 'league.title'])
             .where('league.parentLeague IS NOT NULL')
-            .getMany();
-        return leagues.map(league => ({
+
+        if (query.parentLeagueId) {
+            leagues.andWhere('league.parentLeagueId = :parentLeagueId', { parentLeagueId: query.parentLeagueId })
+        }
+
+        return (await leagues.getMany()).map(league => ({
             id: league.id,
             title: league.title[local]
         }));

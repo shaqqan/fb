@@ -1,18 +1,19 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth,
-  ApiParam,
-  ApiBody,
-  ApiQuery,
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiParam,
+    ApiBody,
+    ApiQuery,
 } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
 import { CreateLeagueDto, UpdateLeagueDto, SimplifiedLeagueDto } from './dto';
 import { League } from '../../../databases/typeorm/entities';
 import { LeaguesService } from './leagues.service';
 import { Public } from 'src/common/decorators';
+import { SubLeagueListDto } from './dto/sub-league-list.dto';
 
 @ApiTags('🏆 Leagues')
 @ApiBearerAuth()
@@ -48,8 +49,8 @@ export class LeaguesController {
         type: 'number',
         description: 'Filter by parent league ID'
     })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'Paginated list of leagues',
         schema: {
             type: 'object',
@@ -95,8 +96,8 @@ export class LeaguesController {
         defaultLimit: 10,
         maxLimit: 100,
     })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'Paginated list of root leagues',
         schema: {
             type: 'object',
@@ -142,8 +143,8 @@ export class LeaguesController {
         defaultLimit: 10,
         maxLimit: 100,
     })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'Paginated list of sub-leagues',
         schema: {
             type: 'object',
@@ -183,8 +184,8 @@ export class LeaguesController {
     @Get('list')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get all leagues with only id and title' })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'List of leagues with id and title',
         type: [SimplifiedLeagueDto]
     })
@@ -195,13 +196,13 @@ export class LeaguesController {
     @Get('list/sub-leagues')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get all sub-leagues with only id and title' })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'List of sub-leagues with id and title',
         type: [SimplifiedLeagueDto]
     })
-    getListSubLeagues(): Promise<SimplifiedLeagueDto[]> {
-        return this.leaguesService.getSimpleSubLeagues();
+    getListSubLeagues(@Query() query: SubLeagueListDto): Promise<SimplifiedLeagueDto[]> {
+        return this.leaguesService.getSimpleSubLeagues(query);
     }
 
     @Get(':id/children')
@@ -218,9 +219,9 @@ export class LeaguesController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get parent league of a specific league' })
     @ApiParam({ name: 'id', description: 'Child league ID', type: 'number' })
-    @ApiResponse({ 
-        status: 200, 
-        description: 'Parent league found (or null if root league)', 
+    @ApiResponse({
+        status: 200,
+        description: 'Parent league found (or null if root league)',
         schema: {
             oneOf: [
                 { $ref: '#/components/schemas/League' },
@@ -235,13 +236,13 @@ export class LeaguesController {
 
     @Get(':id/hierarchy')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ 
+    @ApiOperation({
         summary: 'Get league with full hierarchy (parent, children, and grand-children up to 3 levels)',
         description: 'Returns a league with its complete hierarchical context including parent leagues and child leagues'
     })
     @ApiParam({ name: 'id', description: 'League ID', type: 'number' })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'League with full hierarchy',
         type: League,
         schema: {
@@ -250,12 +251,12 @@ export class LeaguesController {
                 id: { type: 'number' },
                 title: { type: 'object' },
                 logo: { type: 'string' },
-                parentLeague: { 
+                parentLeague: {
                     type: 'object',
                     description: 'Parent league (if exists)',
                     nullable: true
                 },
-                childLeagues: { 
+                childLeagues: {
                     type: 'array',
                     description: 'Direct child leagues',
                     items: { type: 'object' }
