@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsEnum, Min, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsEnum, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { MatchStatus } from 'src/databases/typeorm/entities';
