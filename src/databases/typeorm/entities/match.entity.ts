@@ -80,6 +80,12 @@ export class Match extends BaseEntity {
     @OneToMany(() => MatchScore, (matchScore) => matchScore.match)
     matchScores: MatchScore[];
 
+    @Column({ nullable: true })
+    clubScore: number | null;
+
+    @Column({ nullable: true })
+    opponentClubScore: number | null;
+
     @CreateDateColumn()
     createdAt: Date;
 

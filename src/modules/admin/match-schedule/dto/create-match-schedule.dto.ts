@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsEnum, Min, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { MatchStatus } from 'src/databases/typeorm/entities';
@@ -85,4 +85,24 @@ export class CreateMatchScheduleDto {
   @IsOptional()
   @IsEnum(MatchStatus)
   status?: MatchStatus;
+
+  @ApiProperty({
+    description: 'Club score',
+    example: 2,
+    minimum: 0
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  clubScore?: number;
+
+  @ApiProperty({
+    description: 'Opponent club score',
+    example: 1,
+    minimum: 0
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  opponentClubScore?: number;
 }
