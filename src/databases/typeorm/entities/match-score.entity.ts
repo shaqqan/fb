@@ -13,10 +13,14 @@ export class MatchScore extends BaseEntity {
     @Column()
     matchId: number;
 
-    @Column()
+    @Column({ 
+        type: 'integer' 
+    })
     clubScore: number;
 
-    @Column()
+    @Column({ 
+        type: 'integer' 
+    })
     opponentClubScore: number;
 
     @CreateDateColumn()

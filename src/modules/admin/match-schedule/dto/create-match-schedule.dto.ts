@@ -92,7 +92,10 @@ export class CreateMatchScheduleDto {
     minimum: 0
   })
   @IsOptional()
-  @IsNumber()
+  @IsNumber({
+    allowInfinity: false,
+    allowNaN: false
+  })
   @Min(0)
   clubScore?: number;
 
@@ -102,7 +105,10 @@ export class CreateMatchScheduleDto {
     minimum: 0
   })
   @IsOptional()
-  @IsNumber()
+  @IsNumber({
+    allowInfinity: false,
+    allowNaN: false
+  })
   @Min(0)
   opponentClubScore?: number;
 }

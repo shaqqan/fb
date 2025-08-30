@@ -306,8 +306,8 @@ export class MatchScheduleService {
 
     const score = this.matchScoreRepository.create({
       matchId,
-      clubScore: dto.clubScore,
-      opponentClubScore: dto.opponentClubScore,
+      clubScore: dto.clubScore ?? 0,
+      opponentClubScore: dto.opponentClubScore ?? 0,
     });
 
     return await this.matchScoreRepository.save(score);
