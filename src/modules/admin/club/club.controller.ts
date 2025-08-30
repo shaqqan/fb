@@ -1,21 +1,22 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  HttpCode, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
   HttpStatus,
-  ParseIntPipe 
+  ParseIntPipe,
+  Query
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiParam,
-  ApiBody, 
+  ApiBody,
   ApiBearerAuth
 } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
@@ -23,25 +24,26 @@ import { ClubService } from './club.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
 import { Club } from 'src/databases/typeorm/entities';
+import { ListClubDto } from './dto/list-club.dto';
 
 @ApiTags('🏟️ Club')
 @ApiBearerAuth()
 @Controller('admin/club')
 export class ClubController {
-  constructor(private readonly clubService: ClubService) {}
+  constructor(private readonly clubService: ClubService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new club' })
   @ApiBody({ type: CreateClubDto })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Club created successfully',
-    type: Club 
+    type: Club
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - validation error' 
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - validation error'
   })
   create(@Body() createClubDto: CreateClubDto): Promise<Club> {
     return this.clubService.create(createClubDto);
@@ -57,8 +59,8 @@ export class ClubController {
     defaultLimit: 10,
     maxLimit: 100,
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Paginated list of clubs',
     schema: {
       type: 'object',
@@ -94,18 +96,23 @@ export class ClubController {
     return this.clubService.findAll(query);
   }
 
+  @Get('list')
+  list(@Query() listClubDto: ListClubDto): Promise<Club[]> {
+    return this.clubService.list(listClubDto);
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a club by ID' })
   @ApiParam({ name: 'id', description: 'Club ID', type: 'number' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Club found successfully',
-    type: Club 
+    type: Club
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Club not found' 
+  @ApiResponse({
+    status: 404,
+    description: 'Club not found'
   })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Club> {
     return this.clubService.findOne(id);
@@ -116,21 +123,21 @@ export class ClubController {
   @ApiOperation({ summary: 'Update a club' })
   @ApiParam({ name: 'id', description: 'Club ID', type: 'number' })
   @ApiBody({ type: UpdateClubDto })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Club updated successfully',
-    type: Club 
+    type: Club
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Club not found' 
+  @ApiResponse({
+    status: 404,
+    description: 'Club not found'
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - validation error' 
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - validation error'
   })
   update(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateClubDto: UpdateClubDto
   ): Promise<Club> {
     return this.clubService.update(id, updateClubDto);
@@ -140,8 +147,8 @@ export class ClubController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a club' })
   @ApiParam({ name: 'id', description: 'Club ID', type: 'number' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Club deleted successfully',
     schema: {
       type: 'object',
@@ -150,9 +157,9 @@ export class ClubController {
       }
     }
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Club not found' 
+  @ApiResponse({
+    status: 404,
+    description: 'Club not found'
   })
   remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     return this.clubService.remove(id);

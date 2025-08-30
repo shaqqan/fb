@@ -6,6 +6,7 @@ import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
 import { Club } from 'src/databases/typeorm/entities';
 import { currentLocale } from 'src/common/utils';
+import { ListClubDto } from './dto/list-club.dto';
 
 @Injectable()
 export class ClubService {
@@ -66,6 +67,13 @@ export class ClubService {
       },
       defaultLimit: 10,
       maxLimit: 100,
+    });
+  }
+
+  async list(listClubDto: ListClubDto): Promise<Club[]> {
+    return await this.clubRepository.find({
+      where: { league: { id: listClubDto.leagueId } },
+      relations: ['league', 'subLeague'],
     });
   }
 
