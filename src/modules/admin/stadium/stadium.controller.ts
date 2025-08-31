@@ -1,19 +1,19 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  HttpCode, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
   HttpStatus,
-  ParseIntPipe 
+  ParseIntPipe
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiParam,
   ApiBody,
   ApiBearerAuth
@@ -28,20 +28,20 @@ import { Stadium } from 'src/databases/typeorm/entities';
 @ApiBearerAuth()
 @Controller('admin/stadium')
 export class StadiumController {
-  constructor(private readonly stadiumService: StadiumService) {}
+  constructor(private readonly stadiumService: StadiumService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new stadium' })
   @ApiBody({ type: CreateStadiumDto })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Stadium created successfully',
-    type: Stadium 
+    type: Stadium
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - validation error' 
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - validation error'
   })
   create(@Body() createStadiumDto: CreateStadiumDto): Promise<Stadium> {
     return this.stadiumService.create(createStadiumDto);
@@ -57,8 +57,8 @@ export class StadiumController {
     defaultLimit: 10,
     maxLimit: 100,
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Paginated list of stadiums',
     schema: {
       type: 'object',
@@ -97,12 +97,11 @@ export class StadiumController {
   @Get('list')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all stadiums as a simple list' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'List of all stadiums',
-    type: [Stadium]
   })
-  list(): Promise<Stadium[]> {
+  async list(): Promise<{ id: number, name: string }[]> {
     return this.stadiumService.list();
   }
 
@@ -110,14 +109,14 @@ export class StadiumController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a stadium by ID' })
   @ApiParam({ name: 'id', description: 'Stadium ID', type: 'number' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Stadium found successfully',
-    type: Stadium 
+    type: Stadium
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Stadium not found' 
+  @ApiResponse({
+    status: 404,
+    description: 'Stadium not found'
   })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Stadium> {
     return this.stadiumService.findOne(id);
@@ -128,21 +127,21 @@ export class StadiumController {
   @ApiOperation({ summary: 'Update a stadium' })
   @ApiParam({ name: 'id', description: 'Stadium ID', type: 'number' })
   @ApiBody({ type: UpdateStadiumDto })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Stadium updated successfully',
-    type: Stadium 
+    type: Stadium
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Stadium not found' 
+  @ApiResponse({
+    status: 404,
+    description: 'Stadium not found'
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - validation error' 
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - validation error'
   })
   update(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateStadiumDto: UpdateStadiumDto
   ): Promise<Stadium> {
     return this.stadiumService.update(id, updateStadiumDto);
@@ -152,8 +151,8 @@ export class StadiumController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a stadium' })
   @ApiParam({ name: 'id', description: 'Stadium ID', type: 'number' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Stadium deleted successfully',
     schema: {
       type: 'object',
@@ -162,13 +161,13 @@ export class StadiumController {
       }
     }
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Stadium not found' 
+  @ApiResponse({
+    status: 404,
+    description: 'Stadium not found'
   })
   remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     return this.stadiumService.remove(id);
   }
 
-  
+
 }

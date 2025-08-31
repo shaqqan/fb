@@ -5,13 +5,14 @@ import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { CreateStadiumDto } from './dto/create-stadium.dto';
 import { UpdateStadiumDto } from './dto/update-stadium.dto';
 import { Stadium } from 'src/databases/typeorm/entities';
+import { currentLocale } from 'src/common/utils';
 
 @Injectable()
 export class StadiumService {
   constructor(
     @InjectRepository(Stadium)
     private stadiumRepository: Repository<Stadium>,
-  ) {}
+  ) { }
 
   async create(createStadiumDto: CreateStadiumDto): Promise<Stadium> {
     const stadium = new Stadium();
@@ -47,20 +48,22 @@ export class StadiumService {
     });
   }
 
-  async list(): Promise<Stadium[]> {
-    return await this.stadiumRepository.find({
+  async list(): Promise<{ id: number, name: string }[]> {
+    const local = currentLocale();
+    const stadiums = await this.stadiumRepository.find({
       select: {
         id: true,
         name: true,
-        address: true,
-        city: true,
-        createdAt: true,
-        updatedAt: true,
       },
       order: {
         createdAt: 'DESC',
       },
     });
+
+    return stadiums.map(stadium => ({
+      id: stadium.id,
+      name: stadium.name[local],
+    }));
   }
 
   async findOne(id: number): Promise<Stadium> {
@@ -89,14 +92,14 @@ export class StadiumService {
     const updateData: any = { ...updateStadiumDto };
 
     await this.stadiumRepository.update(id, updateData);
-    
+
     return await this.findOne(id);
   }
 
   async remove(id: number): Promise<{ message: string }> {
     const stadium = await this.findOne(id);
     await this.stadiumRepository.remove(stadium);
-    
+
     return { message: `Stadium with ID ${id} has been successfully deleted` };
   }
 }
