@@ -94,6 +94,18 @@ export class StadiumController {
     return this.stadiumService.findAll(query);
   }
 
+  @Get('list')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all stadiums as a simple list' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'List of all stadiums',
+    type: [Stadium]
+  })
+  list(): Promise<Stadium[]> {
+    return this.stadiumService.list();
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a stadium by ID' })
@@ -157,4 +169,6 @@ export class StadiumController {
   remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     return this.stadiumService.remove(id);
   }
+
+  
 }

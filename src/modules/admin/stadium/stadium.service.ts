@@ -47,6 +47,22 @@ export class StadiumService {
     });
   }
 
+  async list(): Promise<Stadium[]> {
+    return await this.stadiumRepository.find({
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
   async findOne(id: number): Promise<Stadium> {
     const stadium = await this.stadiumRepository.findOne({
       where: { id },
