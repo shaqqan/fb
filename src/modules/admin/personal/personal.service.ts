@@ -86,6 +86,7 @@ export class PersonalService {
         information: true,
         phone: true,
         email: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },
