@@ -17,7 +17,8 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
-  ApiBearerAuth
+  ApiBearerAuth,
+  ApiQuery
 } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
 import { ClubService } from './club.service';
@@ -97,7 +98,14 @@ export class ClubController {
   }
 
   @Get('list')
-  list(@Query() listClubDto: ListClubDto): Promise<Club[]> {
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all clubs list' })
+  @ApiQuery({ name: 'leagueId', description: 'League ID', type: 'number' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of clubs',
+  })
+  list(@Query() listClubDto: ListClubDto): Promise<{ id: number, name: string, logo: string }[]> {
     return this.clubService.list(listClubDto);
   }
 

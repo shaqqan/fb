@@ -70,11 +70,18 @@ export class ClubService {
     });
   }
 
-  async list(listClubDto: ListClubDto): Promise<Club[]> {
-    return await this.clubRepository.find({
+  async list(listClubDto: ListClubDto): Promise<{ id: number, name: string, logo: string }[]> {
+    const local = currentLocale();
+    const clubs = await this.clubRepository.find({
       where: { league: { id: listClubDto.leagueId } },
       relations: ['league', 'subLeague'],
     });
+
+    return clubs.map(club => ({
+      id: club.id,
+      name: club.name[local],
+      logo: club.logo,
+    }));
   }
 
   async findOne(id: number): Promise<Club> {

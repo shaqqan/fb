@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional } from "class-validator";
+import { IsNumber, IsNumberString, IsOptional } from "class-validator";
 import { Exists } from "src/common/decorators/validators";
 import { League } from "src/databases/typeorm/entities/league.entity";
 
@@ -9,7 +9,7 @@ export class SubLeagueListDto {
         example: 1
     })
     @IsOptional()
-    @IsNumber()
+    @IsNumberString()
     @Exists(League, 'id')
     parentLeagueId?: number;
 }
