@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsNumberString } from "class-validator";
 import { Exists } from "src/common/decorators/validators";
 import { League } from "src/databases/typeorm/entities";
 
@@ -9,7 +9,7 @@ export class ListClubDto {
         example: 1
     })
     @IsNotEmpty()
-    @IsNumber()
+    @IsNumberString()
     @Exists(League, 'id')
     leagueId: number;
 }
