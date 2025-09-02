@@ -106,15 +106,15 @@ export class MatchScheduleService {
 
       // Date range filters
       if (query.filter.createdAtStart) {
-        const startDateValue = Array.isArray(query.filter.createdAtStart) 
-          ? query.filter.createdAtStart[0] 
+        const startDateValue = Array.isArray(query.filter.createdAtStart)
+          ? query.filter.createdAtStart[0]
           : query.filter.createdAtStart;
         const startDate = new Date(startDateValue);
         queryBuilder.andWhere('match.createdAt >= :createdAtStart', { createdAtStart: startDate });
       }
       if (query.filter.createdAtEnd) {
-        const endDateValue = Array.isArray(query.filter.createdAtEnd) 
-          ? query.filter.createdAtEnd[0] 
+        const endDateValue = Array.isArray(query.filter.createdAtEnd)
+          ? query.filter.createdAtEnd[0]
           : query.filter.createdAtEnd;
         const endDate = new Date(endDateValue);
         queryBuilder.andWhere('match.createdAt <= :createdAtEnd', { createdAtEnd: endDate });
@@ -122,15 +122,15 @@ export class MatchScheduleService {
 
       // Match date range filters
       if (query.filter.matchDateStart) {
-        const startDateValue = Array.isArray(query.filter.matchDateStart) 
-          ? query.filter.matchDateStart[0] 
+        const startDateValue = Array.isArray(query.filter.matchDateStart)
+          ? query.filter.matchDateStart[0]
           : query.filter.matchDateStart;
         const startDate = new Date(startDateValue);
         queryBuilder.andWhere('match.matchDate >= :matchDateStart', { matchDateStart: startDate });
       }
       if (query.filter.matchDateEnd) {
-        const endDateValue = Array.isArray(query.filter.matchDateEnd) 
-          ? query.filter.matchDateEnd[0] 
+        const endDateValue = Array.isArray(query.filter.matchDateEnd)
+          ? query.filter.matchDateEnd[0]
           : query.filter.matchDateEnd;
         const endDate = new Date(endDateValue);
         queryBuilder.andWhere('match.matchDate <= :matchDateEnd', { matchDateEnd: endDate });
@@ -147,6 +147,7 @@ export class MatchScheduleService {
 
     return paginate(query, queryBuilder, {
       sortableColumns: ['id', 'matchDate', 'status', 'createdAt', 'updatedAt'],
+      select: ['id', 'club', 'opponentClub', 'stadium', 'matchDate', 'status', 'clubScore', 'opponentClubScore'],
       nullSort: 'last',
       defaultSortBy: [['matchDate', 'ASC']],
       searchableColumns: ['club.name', 'opponentClub.name', 'stadium.name'],
@@ -291,9 +292,9 @@ export class MatchScheduleService {
   }
 
   async createScore(matchId: number, dto: CreateMatchScoreDto): Promise<MatchScore> {
-    const match = await this.matchRepository.findOne({ 
+    const match = await this.matchRepository.findOne({
       where: { id: matchId },
-      relations: ['matchScores'] 
+      relations: ['matchScores']
     });
 
     if (!match) {
