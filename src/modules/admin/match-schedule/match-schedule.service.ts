@@ -147,6 +147,7 @@ export class MatchScheduleService {
 
     return paginate(query, queryBuilder, {
       sortableColumns: ['id', 'matchDate', 'status', 'createdAt', 'updatedAt'],
+      relations: ['club', 'opponentClub', 'stadium'],
       select: ['id', 'club', 'opponentClub', 'stadium', 'matchDate', 'status', 'clubScore', 'opponentClubScore'],
       nullSort: 'last',
       defaultSortBy: [['matchDate', 'ASC']],
