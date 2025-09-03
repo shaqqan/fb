@@ -65,11 +65,18 @@ export class MatchScheduleService {
       const local = currentLocale();
       queryBuilder.andWhere(
         `(
-          CAST(club.name->>:locale AS text) ILIKE :search OR 
-          CAST(opponentClub.name->>:locale AS text) ILIKE :search OR 
-          CAST(stadium.name->>:locale AS text) ILIKE :search
+          CAST(club.name->>:clubLocale AS text) ILIKE :clubSearch OR 
+          CAST(opponentClub.name->>:opponentLocale AS text) ILIKE :opponentSearch OR 
+          CAST(stadium.name->>:stadiumLocale AS text) ILIKE :stadiumSearch
         )`,
-        { search: `%${query.search}%`, locale: local }
+        { 
+          clubSearch: `%${query.search}%`, 
+          clubLocale: local,
+          opponentSearch: `%${query.search}%`, 
+          opponentLocale: local,
+          stadiumSearch: `%${query.search}%`, 
+          stadiumLocale: local
+        }
       );
     }
 
