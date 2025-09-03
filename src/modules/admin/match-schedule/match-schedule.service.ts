@@ -59,6 +59,14 @@ export class MatchScheduleService {
         'stadium.city',
       ]);
 
+    // Apply search functionality
+    if (query.search) {
+      queryBuilder.andWhere(
+        '(club.name ILIKE :search OR opponentClub.name ILIKE :search OR stadium.name ILIKE :search)',
+        { search: `%${query.search}%` }
+      );
+    }
+
     // Apply custom filters
     if (query.filter) {
       // League filters
@@ -138,7 +146,7 @@ export class MatchScheduleService {
       sortableColumns: ['id', 'matchDate', 'status', 'createdAt', 'updatedAt'],
       nullSort: 'last',
       defaultSortBy: [['matchDate', 'ASC']],
-      searchableColumns: ['club.name', 'opponentClub.name', 'stadium.name'],
+      // searchableColumns: ['club.name', 'opponentClub.name', 'stadium.name'],
       defaultLimit: 10,
       maxLimit: 100,
     });
