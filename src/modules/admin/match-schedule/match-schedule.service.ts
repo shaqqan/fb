@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
+import { currentLocale } from 'src/common/utils';
 import { CreateMatchScheduleDto } from './dto/create-match-schedule.dto';
 import { UpdateMatchScheduleDto } from './dto/update-match-schedule.dto';
 import { CreateMatchScoreDto } from './dto/create-match-score.dto';
@@ -61,9 +62,14 @@ export class MatchScheduleService {
 
     // Apply search functionality
     if (query.search) {
+      const local = currentLocale();
       queryBuilder.andWhere(
-        '(club.name ILIKE :search OR opponentClub.name ILIKE :search OR stadium.name ILIKE :search)',
-        { search: `%${query.search}%` }
+        `(
+          CAST(club.name->>:locale AS text) ILIKE :search OR 
+          CAST(opponentClub.name->>:locale AS text) ILIKE :search OR 
+          CAST(stadium.name->>:locale AS text) ILIKE :search
+        )`,
+        { search: `%${query.search}%`, locale: local }
       );
     }
 
