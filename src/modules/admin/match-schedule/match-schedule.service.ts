@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { currentLocale } from 'src/common/utils';
 import { CreateMatchScheduleDto } from './dto/create-match-schedule.dto';
@@ -64,19 +64,29 @@ export class MatchScheduleService {
     if (query.search) {
       const local = currentLocale();
       queryBuilder.andWhere(
-        `(
-          CAST(club.name->>:clubLocale AS text) ILIKE :clubSearch OR 
-          CAST(opponentClub.name->>:opponentLocale AS text) ILIKE :opponentSearch OR 
-          CAST(stadium.name->>:stadiumLocale AS text) ILIKE :stadiumSearch
-        )`,
-        { 
-          clubSearch: `%${query.search}%`, 
-          clubLocale: local,
-          opponentSearch: `%${query.search}%`, 
-          opponentLocale: local,
-          stadiumSearch: `%${query.search}%`, 
-          stadiumLocale: local
-        }
+        new Brackets((qb) => {
+          qb.where(
+            `CAST("club"."name"->>:clubLocale AS text) ILIKE :clubSearch`,
+            {
+              clubSearch: `%${query.search}%`,
+              clubLocale: local
+            }
+          )
+            .orWhere(
+              `CAST("opponentClub"."name"->>:opponentLocale AS text) ILIKE :opponentSearch`,
+              {
+                opponentSearch: `%${query.search}%`,
+                opponentLocale: local
+              }
+            )
+            .orWhere(
+              `CAST("stadium"."name"->>:stadiumLocale AS text) ILIKE :stadiumSearch`,
+              {
+                stadiumSearch: `%${query.search}%`,
+                stadiumLocale: local
+              }
+            );
+        })
       );
     }
 
@@ -159,7 +169,6 @@ export class MatchScheduleService {
       sortableColumns: ['id', 'matchDate', 'status', 'createdAt', 'updatedAt'],
       nullSort: 'last',
       defaultSortBy: [['matchDate', 'ASC']],
-      // searchableColumns: ['club.name', 'opponentClub.name', 'stadium.name'],
       defaultLimit: 10,
       maxLimit: 100,
     });
