@@ -2,7 +2,6 @@ import { DataSource } from 'typeorm';
 import * as argon from 'argon2';
 import { User } from '../entities/user.entity';
 import { Role } from '../entities/role.entity';
-import { RoleEnum } from '../entities/enums';
 
 export class UserSeeder {
   async run(dataSource: DataSource): Promise<void> {
@@ -12,46 +11,55 @@ export class UserSeeder {
     // Sample users to seed
     const usersToSeed = [
       {
-        name: 'Admin User',
+        name: 'Super Administrator',
+        email: 'superadmin@kkfa.uz',
+        password: 'SuperAdmin123!',
+        roles: ['SUPER_ADMIN'],
+      },
+      {
+        name: 'System Administrator',
+        email: 'admin@football.com',
+        password: 'Admin123!',
+        roles: ['ADMIN'],
+      },
+      {
+        name: 'Content Moderator',
+        email: 'moderator@football.com',
+        password: 'Moderator123!',
+        roles: ['MODER'],
+      },
+      {
+        name: 'News Editor',
+        email: 'editor@football.com',
+        password: 'Editor123!',
+        roles: ['EDITOR'],
+      },
+      {
+        name: 'Match Reporter',
+        email: 'reporter@football.com',
+        password: 'Reporter123!',
+        roles: ['MODER', 'EDITOR'],
+      },
+      {
+        name: 'Content Viewer',
+        email: 'viewer@football.com',
+        password: 'Viewer123!',
+        roles: ['VIEWER'],
+      },
+      // Legacy users for backward compatibility
+      {
+        name: 'Legacy Admin',
         email: 'admin@example.com',
         password: 'admin123',
-        role: RoleEnum.ADMIN,
+        roles: ['ADMIN'],
       },
       {
-        name: 'Moderator User',
+        name: 'Legacy Moderator',
         email: 'moderator@example.com',
         password: 'moderator123',
-        role: RoleEnum.MODER,
-      },
-      {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'password123',
-        role: RoleEnum.MODER,
-      },
-      {
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        password: 'password123',
-        role: RoleEnum.ADMIN,
+        roles: ['MODER'],
       },
     ];
-
-    console.log('🌱 Ensuring roles exist...');
-
-    // Ensure required roles exist
-    const roleNames: string[] = [RoleEnum.ADMIN, RoleEnum.MODER];
-    const nameToRole = new Map<string, Role>();
-
-    for (const name of roleNames) {
-      let role = await roleRepository.findOne({ where: { name } });
-      if (!role) {
-        role = roleRepository.create({ name });
-        role = await roleRepository.save(role);
-        console.log(`✅ Created role: ${name}`);
-      }
-      nameToRole.set(name, role);
-    }
 
     console.log('🌱 Seeding users...');
 
@@ -69,10 +77,23 @@ export class UserSeeder {
       // Hash the password
       const hashedPassword = await argon.hash(userData.password);
 
-      // Map RoleEnum to Role entity 
-      const roleEntity = nameToRole.get(userData.role);
-      if (!roleEntity) {
-        throw new Error(`Role ${userData.role} was not found or created`);
+      // Get roles for this user
+      const userRoles: Role[] = [];
+      for (const roleName of userData.roles) {
+        const role = await roleRepository.findOne({ 
+          where: { name: roleName },
+          relations: ['permissions']
+        });
+        if (role) {
+          userRoles.push(role);
+        } else {
+          console.warn(`⚠️ Role ${roleName} not found for user ${userData.email}`);
+        }
+      }
+
+      if (userRoles.length === 0) {
+        console.warn(`⚠️ No valid roles found for user ${userData.email}, skipping...`);
+        continue;
       }
 
       // Create new user
@@ -80,7 +101,7 @@ export class UserSeeder {
         name: userData.name,
         email: userData.email,
         hash: hashedPassword,
-        roles: [roleEntity],
+        roles: userRoles,
         hashedRt: null,
       });
 

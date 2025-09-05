@@ -82,4 +82,9 @@ export enum Permissions {
   STAFF_READ = 'STAFF_READ',
   STAFF_UPDATE = 'STAFF_UPDATE',
   STAFF_DELETE = 'STAFF_DELETE',
+
+  // Auth Management
+  AUTH_LOGIN = 'AUTH_LOGIN',
+  AUTH_LOGOUT = 'AUTH_LOGOUT',
+  AUTH_REFRESH = 'AUTH_REFRESH',
 }

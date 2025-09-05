@@ -10,6 +10,11 @@ export class PermissionSeeder {
 
         // Define permissions with descriptions
         const permissionsToSeed = [
+            // Authentication Management
+            { name: Permissions.AUTH_LOGIN, description: 'Право на вход в систему администрирования' },
+            { name: Permissions.AUTH_LOGOUT, description: 'Право на безопасный выход из системы' },
+            { name: Permissions.AUTH_REFRESH, description: 'Право на обновление токенов аутентификации' },
+
             // User Management
             { name: Permissions.USER_CREATE, description: 'Создание новых пользователей в системе' },
             { name: Permissions.USER_READ, description: 'Просмотр информации о пользователях и списка пользователей' },

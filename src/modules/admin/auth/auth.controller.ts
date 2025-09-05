@@ -16,6 +16,8 @@ import {
 
 import { Public, GetCurrentUserId, GetCurrentUser } from '../../../common/decorators';
 import { RtGuard } from '../../../common/guards/rt.guard';
+import { RequirePermissions } from '../../../common/decorators/permissions.decorator';
+import { Permissions } from '../../../common/enums/permission.enum';
 import { AuthService } from './auth.service';
 import { AuthDto, SignUpDto } from './dto';
 import { Tokens } from '../../../common/types';
@@ -50,6 +52,7 @@ export class AuthController {
   @Public()
   @Post('signin')
   @HttpCode(HttpStatus.OK)
+  @RequirePermissions(Permissions.AUTH_LOGIN)
   @ApiOperation({ summary: 'Sign in user' })
   @ApiBody({ type: AuthDto })
   @ApiResponse({
@@ -75,6 +78,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
+  @RequirePermissions(Permissions.AUTH_LOGOUT)
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'User successfully logged out' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -87,6 +91,7 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
+  @RequirePermissions(Permissions.AUTH_REFRESH)
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({
     status: 200,

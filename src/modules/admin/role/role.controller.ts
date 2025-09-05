@@ -1,5 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RequirePermissions } from 'src/common/decorators/permissions.decorator';
+import { Permissions } from 'src/common/enums/permission.enum';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
