@@ -185,7 +185,6 @@ export class MatchScheduleService {
         'opponentLeague',
         'opponentSubLeague',
         'stadium',
-        'matchScores'
       ],
       select: {
         id: true,
@@ -225,7 +224,8 @@ export class MatchScheduleService {
           address: true,
           city: true,
         },
-        matchScores: true,
+        clubScore: true,
+        opponentClubScore: true,
       },
     });
 
@@ -239,49 +239,7 @@ export class MatchScheduleService {
   async update(id: number, updateMatchScheduleDto: UpdateMatchScheduleDto): Promise<Match> {
     const match = await this.findOne(id);
 
-    const updateData: any = { ...updateMatchScheduleDto };
-
-    if (updateMatchScheduleDto.clubId) {
-      updateData.club = { id: updateMatchScheduleDto.clubId };
-      delete updateData.clubId;
-    }
-
-    if (updateMatchScheduleDto.clubLeagueId) {
-      updateData.clubLeague = { id: updateMatchScheduleDto.clubLeagueId };
-      delete updateData.clubLeagueId;
-    }
-
-    if (updateMatchScheduleDto.clubSubLeagueId !== undefined) {
-      updateData.clubSubLeague = updateMatchScheduleDto.clubSubLeagueId ? { id: updateMatchScheduleDto.clubSubLeagueId } : null;
-      delete updateData.clubSubLeagueId;
-    }
-
-    if (updateMatchScheduleDto.opponentClubId) {
-      updateData.opponentClub = { id: updateMatchScheduleDto.opponentClubId };
-      delete updateData.opponentClubId;
-    }
-
-    if (updateMatchScheduleDto.opponentLeagueId) {
-      updateData.opponentLeague = { id: updateMatchScheduleDto.opponentLeagueId };
-      delete updateData.opponentLeagueId;
-    }
-
-    if (updateMatchScheduleDto.opponentSubLeagueId !== undefined) {
-      updateData.opponentSubLeague = updateMatchScheduleDto.opponentSubLeagueId ? { id: updateMatchScheduleDto.opponentSubLeagueId } : null;
-      delete updateData.opponentSubLeagueId;
-    }
-
-    if (updateMatchScheduleDto.stadiumId) {
-      updateData.stadium = { id: updateMatchScheduleDto.stadiumId };
-      delete updateData.stadiumId;
-    }
-
-    if (updateMatchScheduleDto.matchDate) {
-      updateData.matchDate = new Date(updateMatchScheduleDto.matchDate);
-      delete updateData.matchDate;
-    }
-
-    await this.matchRepository.update(id, updateData);
+    await this.matchRepository.update(match.id, updateMatchScheduleDto);
 
     return await this.findOne(id);
   }

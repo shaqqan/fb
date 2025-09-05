@@ -33,6 +33,9 @@ export class Match extends BaseEntity {
     @JoinColumn({ name: 'clubLeagueId' })
     clubLeague: League;
 
+    @Column()
+    clubSubLeagueId: number;
+
     @ManyToOne(() => League)
     @JoinColumn({ name: 'clubSubLeagueId' })
     clubSubLeague: League;
@@ -50,6 +53,9 @@ export class Match extends BaseEntity {
     @ManyToOne(() => League)
     @JoinColumn({ name: 'opponentLeagueId' })
     opponentLeague: League;
+
+    @Column()
+    opponentSubLeagueId: number;
 
     @Column()
     opponentLeagueId: number;
@@ -80,15 +86,15 @@ export class Match extends BaseEntity {
     @OneToMany(() => MatchScore, (matchScore) => matchScore.match)
     matchScores: MatchScore[];
 
-    @Column({ 
-        type: 'integer', 
-        nullable: true 
+    @Column({
+        type: 'integer',
+        nullable: true
     })
     clubScore: number | null;
 
-    @Column({ 
-        type: 'integer', 
-        nullable: true 
+    @Column({
+        type: 'integer',
+        nullable: true
     })
     opponentClubScore: number | null;
 
@@ -97,4 +103,4 @@ export class Match extends BaseEntity {
 
     @UpdateDateColumn()
     updatedAt: Date;
-}
+}  
