@@ -11,7 +11,7 @@ export class PermissionService {
   constructor(
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
-  ) {}
+  ) { }
 
   async create(dto: CreatePermissionDto): Promise<Permission> {
     const existing = await this.permissionRepository.findOne({ where: { name: dto.name } });
@@ -32,6 +32,18 @@ export class PermissionService {
       searchableColumns: ['name', 'description'],
       defaultLimit: 10,
       maxLimit: 100,
+    });
+  }
+
+  async list(): Promise<Permission[]> {
+    return await this.permissionRepository.find({
+      select: {
+        id: true,
+        name: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
     });
   }
 

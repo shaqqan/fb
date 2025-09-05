@@ -4,7 +4,6 @@ export * from './news.entity';
 export * from './league.entity';
 export * from './club.entity';
 export * from './partner.entity';
-export * from './staff.entity';
 
 export * from './match.entity';
 export * from './match-score.entity';

@@ -13,7 +13,7 @@ export class RoleService {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
-  ) {}
+  ) { }
 
   async create(dto: CreateRoleDto): Promise<Role> {
     const existing = await this.roleRepository.findOne({ where: { name: dto.name } });
@@ -25,13 +25,13 @@ export class RoleService {
 
     if (dto.permissionIds && dto.permissionIds.length > 0) {
       const permissions = await this.permissionRepository.findBy({ id: In(dto.permissionIds) });
-      
+
       if (permissions.length !== dto.permissionIds.length) {
         const foundIds = permissions.map(p => p.id);
         const missingIds = dto.permissionIds.filter(id => !foundIds.includes(id));
         throw new NotFoundException(`Permissions with IDs ${missingIds.join(', ')} not found`);
       }
-      
+
       role.permissions = permissions;
     }
 
@@ -63,7 +63,7 @@ export class RoleService {
   }
 
   async findOne(id: number): Promise<Role> {
-    const role = await this.roleRepository.findOne({ 
+    const role = await this.roleRepository.findOne({
       where: { id },
       relations: ['permissions'],
       select: {
@@ -78,17 +78,17 @@ export class RoleService {
         },
       },
     });
-    
+
     if (!role) {
       throw new NotFoundException(`Role with ID ${id} not found`);
     }
-    
+
     return role;
   }
 
   async update(id: number, dto: UpdateRoleDto): Promise<Role> {
     const role = await this.roleRepository.findOne({ where: { id }, relations: ['permissions'] });
-    
+
     if (!role) {
       throw new NotFoundException(`Role with ID ${id} not found`);
     }
@@ -104,13 +104,13 @@ export class RoleService {
     if (dto.permissionIds !== undefined) {
       if (dto.permissionIds.length > 0) {
         const permissions = await this.permissionRepository.findBy({ id: In(dto.permissionIds) });
-        
+
         if (permissions.length !== dto.permissionIds.length) {
           const foundIds = permissions.map(p => p.id);
           const missingIds = dto.permissionIds.filter(id => !foundIds.includes(id));
           throw new NotFoundException(`Permissions with IDs ${missingIds.join(', ')} not found`);
         }
-        
+
         role.permissions = permissions;
       } else {
         role.permissions = [];
@@ -122,18 +122,32 @@ export class RoleService {
   }
 
   async remove(id: number): Promise<{ message: string }> {
-    const role = await this.roleRepository.findOne({ 
+    const role = await this.roleRepository.findOne({
       where: { id },
       relations: ['permissions'],
     });
-    
+
     if (!role) {
       throw new NotFoundException(`Role with ID ${id} not found`);
     }
 
     // Remove role (this will automatically remove entries from role_permission_relation due to cascade)
     await this.roleRepository.remove(role);
-    
+
     return { message: `Role with ID ${id} has been successfully deleted` };
+  }
+
+  async list(): Promise<Role[]> {
+    const roles = await this.roleRepository.find({
+      select: {
+        id: true,
+        name: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return roles;
   }
 }

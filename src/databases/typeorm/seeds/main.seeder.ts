@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from '../data-source';
 import { UserSeeder } from './user.seeder';
+import { PermissionSeeder } from './permission.seeder';
 
 async function runSeeders() {
   console.log('🚀 Starting database seeding...');
@@ -12,7 +13,10 @@ async function runSeeders() {
     await dataSource.initialize();
     console.log('📊 Database connection established');
 
-    // Run seeders
+    // Run seeders - permissions first, then users
+    const permissionSeeder = new PermissionSeeder();
+    await permissionSeeder.run(dataSource);
+
     const userSeeder = new UserSeeder();
     await userSeeder.run(dataSource);
 

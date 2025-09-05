@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { NewsModule } from './news/news.module';
-import { StaffModule } from './staff/staff.module';
 import { PartnerModule } from './partner/partner.module';
 import { LeaguesModule } from './leagues/leagues.module';
 import { UploadModule } from './upload/upload.module';
@@ -11,12 +10,12 @@ import { StadiumModule } from './stadium/stadium.module';
 import { PersonalModule } from './personal/personal.module';
 import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     AuthModule,
     NewsModule,
-    StaffModule,
     PartnerModule,
     LeaguesModule,
     UploadModule,
@@ -26,6 +25,7 @@ import { PermissionModule } from './permission/permission.module';
     PersonalModule,
     RoleModule,
     PermissionModule,
+    UserModule,
   ]
 })
 export class AdminModule {}

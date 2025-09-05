@@ -10,7 +10,7 @@ import { Permission } from 'src/databases/typeorm/entities';
 @ApiBearerAuth()
 @Controller('admin/permission')
 export class PermissionController {
-  constructor(private readonly permissionService: PermissionService) {}
+  constructor(private readonly permissionService: PermissionService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -31,8 +31,8 @@ export class PermissionController {
     defaultLimit: 10,
     maxLimit: 100,
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Paginated list of permissions',
     schema: {
       type: 'object',
@@ -66,6 +66,14 @@ export class PermissionController {
   })
   findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Permission>> {
     return this.permissionService.findAll(query);
+  }
+
+  @Get('list')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all permissions' })
+  @ApiResponse({ status: 200, description: 'Permissions found', type: [Permission] })
+  list(): Promise<Permission[]> {
+    return this.permissionService.list();
   }
 
   @Get(':id')

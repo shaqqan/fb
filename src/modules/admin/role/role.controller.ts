@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery, Paginated, ApiPaginationQuery } from 'nestjs-paginate';
 import { RoleService } from './role.service';
@@ -10,7 +10,7 @@ import { Role } from 'src/databases/typeorm/entities';
 @ApiBearerAuth()
 @Controller('admin/role')
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -32,8 +32,8 @@ export class RoleController {
     defaultLimit: 10,
     maxLimit: 100,
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Paginated list of roles',
     schema: {
       type: 'object',
@@ -69,14 +69,24 @@ export class RoleController {
     return this.roleService.findAll(query);
   }
 
+  @Get('list')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all roles' })
+  @ApiResponse({ status: 200, description: 'Roles found', type: [Role] })
+  list(): Promise<Role[]> {
+    return this.roleService.list();
+  }
+
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get role by ID' })
   @ApiParam({ name: 'id', description: 'Role ID', type: 'number' })
   @ApiResponse({ status: 200, description: 'Role found', type: Role })
+  @ApiResponse({ status: 400, description: 'Bad request - invalid role ID' })
   @ApiResponse({ status: 404, description: 'Role not found' })
-  findOne(@Param('id') id: string): Promise<Role> {
-    return this.roleService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Role> {
+    return this.roleService.findOne(id);
   }
 
   @Patch(':id')
@@ -85,19 +95,22 @@ export class RoleController {
   @ApiParam({ name: 'id', description: 'Role ID', type: 'number' })
   @ApiBody({ type: UpdateRoleDto })
   @ApiResponse({ status: 200, description: 'Role updated successfully', type: Role })
+  @ApiResponse({ status: 400, description: 'Bad request - invalid role ID or role name already exists' })
   @ApiResponse({ status: 404, description: 'Role not found' })
-  @ApiResponse({ status: 400, description: 'Bad request - role name already exists' })
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
-    return this.roleService.update(+id, updateRoleDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
+    return this.roleService.update(id, updateRoleDto);
   }
+
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete role' })
-  @ApiParam({ name: 'id', description: 'Role ID', type: 'number' })
   @ApiResponse({ status: 200, description: 'Role deleted successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request - invalid role ID' })
   @ApiResponse({ status: 404, description: 'Role not found' })
-  remove(@Param('id') id: string): Promise<{ message: string }> {
-    return this.roleService.remove(+id);
+  @ApiParam({ name: 'id', description: 'Role ID', type: 'number' })
+  remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+    return this.roleService.remove(id);
   }
+
 }
