@@ -14,11 +14,14 @@ import {
 import { plainToClass } from 'class-transformer';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('👤 User ')
+@ApiBearerAuth()
 @Controller('admin/users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
@@ -31,7 +34,7 @@ export class UserController {
   @Get()
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.userService.findAll();
-    return users.map(user => 
+    return users.map(user =>
       plainToClass(UserResponseDto, user, {
         excludeExtraneousValues: true,
       })

@@ -1,5 +1,6 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { AdminModule, adminModules } from 'src/modules/admin/admin.module';
 export const setupSwaggerAdmin = (app: INestApplication): void => {
     const swaggerConfig = new DocumentBuilder()
         .setTitle('Football Board Admin API')
@@ -26,7 +27,7 @@ export const setupSwaggerAdmin = (app: INestApplication): void => {
         .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig, {
-        // include: [AdminModule],
+        include: adminModules,
     });
 
     SwaggerModule.setup('/admin/api-docs', app, document, {

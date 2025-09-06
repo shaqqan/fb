@@ -4,7 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { HttpStatus, UnprocessableEntityException, ValidationPipe } from '@nestjs/common';
 import * as compression from 'compression';
 import { join } from 'path';
-import { setupSwaggerAdmin } from './common/swagger';
+import { setupSwaggerAdmin, setupSwaggerClient } from './common/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -37,6 +37,7 @@ async function bootstrap() {
 
   // Swagger configuration
   setupSwaggerAdmin(app);
+  setupSwaggerClient(app);
 
   //compress response
   app.use(compression());
@@ -49,7 +50,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3002;
   await app.listen(port, '0.0.0.0', async () => {
     console.log(`🚀 Server is running on ${await app.getUrl()}`);
-    console.log(`📚 Swagger documentation is available at ${await app.getUrl()}/admin/api-docs`);
+    console.log(`📚 Admin Swagger documentation is available at ${await app.getUrl()}/admin/api-docs`);
+    console.log(`📚 Client Swagger documentation is available at ${await app.getUrl()}/client/api-docs`);
   });
 }
 bootstrap();

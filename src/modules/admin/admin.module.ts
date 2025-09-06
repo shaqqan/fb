@@ -12,20 +12,22 @@ import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { UserModule } from './user/user.module';
 
+export const adminModules = [
+  AuthModule,
+  NewsModule,
+  PartnerModule,
+  LeaguesModule,
+  UploadModule,
+  ClubModule,
+  MatchScheduleModule,
+  StadiumModule,
+  PersonalModule,
+  RoleModule,
+  PermissionModule,
+  UserModule,
+]
+
 @Module({
-  imports: [
-    AuthModule,
-    NewsModule,
-    PartnerModule,
-    LeaguesModule,
-    UploadModule,
-    ClubModule,
-    MatchScheduleModule,
-    StadiumModule,
-    PersonalModule,
-    RoleModule,
-    PermissionModule,
-    UserModule,
-  ]
+  imports: adminModules
 })
-export class AdminModule {}
+export class AdminModule { }
