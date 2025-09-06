@@ -9,4 +9,4 @@ export const clientModules = [NewsModule, ClubModule, PartnerModule, MatchModule
 @Module({
   imports: clientModules
 })
-export class ClientModule {}
+export class ClientModule { }
