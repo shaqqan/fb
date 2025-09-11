@@ -1,9 +1,10 @@
-import { Controller, Get, Param, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ClubService } from './club.service';
 import { Public } from 'src/common/decorators';
 import { Club, Match } from 'src/databases/typeorm/entities';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { ClubPointDto } from './dto/club-point.dto';
 
 @ApiTags('⚽ Client Clubs')
 @Controller('client/club')
@@ -38,8 +39,8 @@ export class ClubController {
 
   @Get('point')
   @HttpCode(HttpStatus.OK)
-  getCalcPonts() {
-    return this.clubService.getCalcPonts();
+  getCalcPonts(@Query() query: ClubPointDto) {
+    return this.clubService.getCalcPonts(query);
   }
 
   @Get('/:id')

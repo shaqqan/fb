@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Club, Match, MatchStatus } from 'src/databases/typeorm/entities';
 import { currentLocale } from 'src/common/utils';
 import { PaginateQuery, Paginated, paginate, FilterOperator } from 'nestjs-paginate';
+import { ClubPointDto } from './dto/club-point.dto';
 
 @Injectable()
 export class ClubService {
@@ -192,22 +193,48 @@ export class ClubService {
     });
   }
 
-  public async getCalcPonts() {
+  public async getCalcPonts(query: ClubPointDto) {
     const local = currentLocale();
+    let startDate;
+    let endDate;
+    if (query.season) {
+      startDate = new Date(query.season + '-01-01');
+      endDate = new Date(query.season + '-12-31');
+    }
+
     const clubs = await this.clubRepository.find({
       select: {
         id: true,
         name: true,
         logo: true,
       },
-      relations: ['league', 'subLeague'],
+      relations: ['league', 'subLeague', 'matches'],
+      where: {
+        league: {
+          id: query.leagueId,
+        },
+        subLeague: {
+          id: query.subLeagueId,
+        },
+      },
+      order: {
+        id: 'ASC',
+      },
     });
 
     const clubStats = await Promise.all(clubs.map(async club => {
       const matches = await this.matchRepository.find({
         where: [
-          { clubId: club.id, status: MatchStatus.FINISHED },
-          { opponentClubId: club.id, status: MatchStatus.FINISHED }
+          {
+            clubId: club.id,
+            status: MatchStatus.FINISHED,
+            ...(startDate && endDate ? { matchDate: Between(startDate, endDate) } : {})
+          },
+          {
+            opponentClubId: club.id,
+            status: MatchStatus.FINISHED,
+            ...(startDate && endDate ? { matchDate: Between(startDate, endDate) } : {})
+          }
         ],
         select: ['id', 'clubId', 'opponentClubId', 'clubScore', 'opponentClubScore', 'clubLeagueId', 'clubSubLeagueId', 'opponentLeagueId', 'opponentSubLeagueId']
       });
