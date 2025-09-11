@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import * as argon from 'argon2';
 import { User, Role } from '../../../databases/typeorm/entities';
 import { CreateUserDto, UpdateUserDto } from './dto';
@@ -17,7 +18,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, password, roleIds, ...userData } = createUserDto;
@@ -55,29 +56,21 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    const queryBuilder = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.roles', 'roles')
-      .leftJoinAndSelect('user.news', 'news')
-      .select([
-        'user.id',
-        'user.avatar',
-        'user.name',
-        'user.email',
-        'user.createdAt',
-        'user.updatedAt',
-        'roles.id',
-        'roles.name',
-        'roles.createdAt',
-        'roles.updatedAt',
-        'news.id',
-        'news.title',
-        'news.createdAt',
-        'news.updatedAt',
-      ]);
-
-    return await queryBuilder.getMany();
+  async findAll(query: PaginateQuery): Promise<Paginated<User>> {
+    return paginate(query, this.userRepository, {
+      relations: {
+        roles: true,
+      },
+      select: ['id', 'name', 'email', 'createdAt', 'updatedAt'],
+      sortableColumns: ['id', 'name', 'email', 'createdAt', 'updatedAt'],
+      searchableColumns: ['name', 'email'],
+      defaultSortBy: [['id', 'DESC']],
+      defaultLimit: 10,
+      maxLimit: 100,
+      filterableColumns: {
+        'roles.name': true,
+      },
+    });
   }
 
   async findOne(id: number): Promise<User> {
@@ -201,7 +194,7 @@ export class UserService {
 
   async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
     const hashedRt = refreshToken ? await argon.hash(refreshToken) : null;
-    
+
     await this.userRepository.update(userId, {
       hashedRt,
     });
