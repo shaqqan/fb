@@ -4,8 +4,9 @@ import { ClubModule } from './club/club.module';
 import { PartnerModule } from './partner/partner.module';
 import { MatchModule } from './match/match.module';
 import { PersonalModule } from './personal/personal.module';
+import { AboutModule } from './about/about.module';
 
-export const clientModules = [NewsModule, ClubModule, PartnerModule, MatchModule, PersonalModule]
+export const clientModules = [NewsModule, ClubModule, PartnerModule, MatchModule, PersonalModule, AboutModule]
 @Module({
   imports: clientModules
 })
