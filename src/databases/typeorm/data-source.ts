@@ -24,7 +24,7 @@ export const dataSourceOptions: DataSourceOptions = {
     path.join(__dirname, 'subscribers', '*.subscriber{.ts,.js}'),
   ],
   synchronize: process.env.NODE_ENV === 'development',
-  logging: process.env.NODE_ENV === 'development',
+  logging: process.env.NODE_ENV !== 'development',
 };
 
 const dataSource = new DataSource(dataSourceOptions);

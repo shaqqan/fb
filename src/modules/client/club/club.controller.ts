@@ -36,6 +36,12 @@ export class ClubController {
     return this.clubService.list();
   }
 
+  @Get('point')
+  @HttpCode(HttpStatus.OK)
+  getCalcPonts() {
+    return this.clubService.getCalcPonts();
+  }
+
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -339,4 +345,5 @@ export class ClubController {
   ): Promise<Paginated<Match>> {
     return this.clubService.getUpcomingMatches(id, query);
   }
+
 }

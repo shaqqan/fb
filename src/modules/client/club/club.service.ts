@@ -191,4 +191,97 @@ export class ClubService {
       ]
     });
   }
+
+  public async getCalcPonts() {
+    const local = currentLocale();
+    const clubs = await this.clubRepository.find({
+      select: {
+        id: true,
+        name: true,
+        logo: true,
+      },
+      relations: ['league', 'subLeague'],
+    });
+
+    const clubStats = await Promise.all(clubs.map(async club => {
+      const matches = await this.matchRepository.find({
+        where: [
+          { clubId: club.id, status: MatchStatus.FINISHED },
+          { opponentClubId: club.id, status: MatchStatus.FINISHED }
+        ],
+        select: ['id', 'clubId', 'opponentClubId', 'clubScore', 'opponentClubScore', 'clubLeagueId', 'clubSubLeagueId', 'opponentLeagueId', 'opponentSubLeagueId']
+      });
+
+      let matchesPlayed = 0;
+      let wins = 0;
+      let draws = 0;
+      let losses = 0;
+      let goalsScored = 0;
+      let goalsConceded = 0;
+      let totalPoints = 0;
+
+      matches.forEach(match => {
+        if (match.clubScore !== null && match.opponentClubScore !== null) {
+          let shouldCountMatch = false;
+
+          if (match.clubId === club.id) {
+            shouldCountMatch = match.opponentLeagueId === match.clubLeagueId &&
+              match.opponentSubLeagueId === match.clubSubLeagueId;
+          } else {
+            shouldCountMatch = match.clubLeagueId === match.opponentLeagueId &&
+              match.clubSubLeagueId === match.opponentSubLeagueId;
+          }
+
+          if (shouldCountMatch) {
+            matchesPlayed++;
+
+            if (match.clubId === club.id) {
+              // Club is the home team
+              goalsScored += match.clubScore;
+              goalsConceded += match.opponentClubScore;
+
+              if (match.clubScore > match.opponentClubScore) {
+                wins++;
+                totalPoints += 3; // Victory = +3 points
+              } else if (match.clubScore === match.opponentClubScore) {
+                draws++;
+                totalPoints += 1; // Draw = +1 point
+              } else {
+                losses++;
+              }
+            } else {
+              // Club is the away team (opponent)
+              goalsScored += match.opponentClubScore;
+              goalsConceded += match.clubScore;
+
+              if (match.opponentClubScore > match.clubScore) {
+                wins++;
+                totalPoints += 3; // Victory = +3 points
+              } else if (match.opponentClubScore === match.clubScore) {
+                draws++;
+                totalPoints += 1; // Draw = +1 point
+              } else {
+                losses++;
+              }
+            }
+          }
+        }
+      });
+
+      return {
+        id: club.id,
+        name: club.name[local],
+        logo: club.logo,
+        matches_played: matchesPlayed,
+        wins: wins,
+        draws: draws,
+        losses: losses,
+        goals_scored: goalsScored,
+        goals_conceded: goalsConceded,
+        total_points: totalPoints,
+      };
+    }));
+
+    return clubStats;
+  }
 }

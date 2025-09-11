@@ -7,8 +7,10 @@ import {
   ManyToOne,
   JoinColumn,
   BaseEntity,
+  OneToMany,
 } from 'typeorm';
 import { League } from './league.entity';
+import { Match } from './match.entity';
 
 @Entity('club')
 export class Club extends BaseEntity {
@@ -31,6 +33,9 @@ export class Club extends BaseEntity {
 
   @Column({ type: 'jsonb' })
   information: any;
+
+  @OneToMany(() => Match, (match) => match.club)
+  matches: Match[];
 
   @CreateDateColumn()
   createdAt: Date;
