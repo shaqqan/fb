@@ -11,6 +11,7 @@ import { PersonalModule } from './personal/personal.module';
 import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { UserModule } from './user/user.module';
+import { AboutModule } from './about/about.module';
 
 export const adminModules = [
   AuthModule,
@@ -25,6 +26,7 @@ export const adminModules = [
   RoleModule,
   PermissionModule,
   UserModule,
+  AboutModule,
 ]
 
 @Module({

@@ -13,3 +13,4 @@ export * from './personal.entity';
 
 export * from './role.entity'
 export * from './permission.entity'
+export * from './about.entity'
