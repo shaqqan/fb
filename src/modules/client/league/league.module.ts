@@ -10,3 +10,5 @@ import { League } from 'src/databases/typeorm/entities';
   providers: [LeagueService],
 })
 export class LeagueModule { }
+
+

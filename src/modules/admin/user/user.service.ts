@@ -61,7 +61,7 @@ export class UserService {
       relations: {
         roles: true,
       },
-      select: ['id', 'name', 'email', 'createdAt', 'updatedAt'],
+      select: ['id', 'name', 'email', 'avatar', 'createdAt', 'updatedAt'],
       sortableColumns: ['id', 'name', 'email', 'createdAt', 'updatedAt'],
       searchableColumns: ['name', 'email'],
       defaultSortBy: [['id', 'DESC']],
