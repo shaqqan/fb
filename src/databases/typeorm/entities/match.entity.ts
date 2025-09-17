@@ -104,7 +104,10 @@ export class Match extends BaseEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column({ nullable: true })
+    @Column({ 
+        type: 'varchar',
+        nullable: true 
+    })
     file: string | null;
 
 }  
