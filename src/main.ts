@@ -7,7 +7,9 @@ import { join } from 'path';
 import { setupSwaggerAdmin, setupSwaggerClient } from './common/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+  });
 
   // Enable validation pipes globally
   app.useGlobalPipes(new ValidationPipe({
@@ -27,10 +29,6 @@ async function bootstrap() {
   }));
 
   // Enable CORS
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN || '*',
-    credentials: true,
-  });
 
   // Set global prefix for API routes
   app.setGlobalPrefix('api/v1');
