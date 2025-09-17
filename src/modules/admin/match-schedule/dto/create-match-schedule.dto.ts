@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsEnum, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsEnum, Min, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { MatchStatus } from 'src/databases/typeorm/entities';
@@ -111,4 +111,14 @@ export class CreateMatchScheduleDto {
   })
   @Min(0)
   opponentClubScore?: number;
+
+  @ApiProperty({
+    description: 'File path',
+    example: 'file.pdf',
+    maxLength: 255
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  file?: string;
 }

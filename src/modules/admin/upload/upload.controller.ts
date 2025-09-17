@@ -56,7 +56,7 @@ export class UploadController {
       },
     }),
     fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp|pdf)$/)) {
         return cb(new Error('Only image files are allowed!'), false);
       }
       cb(null, true);
