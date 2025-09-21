@@ -26,4 +26,35 @@ export class NewsService {
       maxLimit: 50,
     });
   }
+
+  async findOne(id: number): Promise<News> {
+    const news = await this.newsRepository.findOne({
+      where: { 
+        id,
+        status: NewsStatus.PUBLISHED 
+      },
+      relations: ['author'],
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        images: true,
+        status: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          id: true,
+          name: true,
+          avatar: true,
+        }
+      }
+    });
+
+    if (!news) {
+      throw new NotFoundException(`News with ID ${id} not found or not published`);
+    }
+
+    return news;
+  }
 }

@@ -1,5 +1,5 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { NewsService } from './news.service';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { News } from 'src/databases/typeorm/entities';
@@ -95,5 +95,65 @@ export class NewsController {
   })
   findAll(@Paginate() query: PaginateQuery): Promise<Paginated<News>> {
     return this.newsService.findAll(query);
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get a published news by ID',
+    description: 'Retrieves a published news article by its ID with author information.'
+  })
+  @ApiParam({ name: 'id', required: true, description: 'News article ID', type: 'string', example: '1' })
+  @ApiResponse({
+    status: 200,
+    description: 'Published news article found successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number', example: 1 },
+        title: { 
+          type: 'object', 
+          description: 'News title in multiple languages',
+          example: { en: 'Breaking News', uz: 'Jarayonli Yangiliklar' }
+        },
+        description: { 
+          type: 'object', 
+          description: 'News content in multiple languages',
+          example: { en: 'News content here...', uz: 'Yangilik matni...' }
+        },
+        images: { 
+          type: 'array', 
+          items: { type: 'string' },
+          example: ['/uploads/image1.jpg', '/uploads/image2.png']
+        },
+        status: { type: 'string', enum: ['PUBLISHED'], example: 'PUBLISHED' },
+        publishedAt: { type: 'string', format: 'date-time', example: '2024-01-15T10:30:00.000Z' },
+        createdAt: { type: 'string', format: 'date-time', example: '2024-01-15T09:00:00.000Z' },
+        updatedAt: { type: 'string', format: 'date-time', example: '2024-01-15T10:30:00.000Z' },
+        author: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: 1 },
+            name: { type: 'string', example: 'John Doe' },
+            avatar: { type: 'string', example: '/uploads/avatar.jpg' }
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'News article not found or not published',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 404 },
+        message: { type: 'string', example: 'News with ID 1 not found or not published' },
+        error: { type: 'string', example: 'Not Found' }
+      }
+    }
+  })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<News> {
+    return this.newsService.findOne(id);
   }
 }
