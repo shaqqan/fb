@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { News, NewsStatus } from 'src/databases/typeorm/entities';
 import { PaginateQuery, Paginated, paginate } from 'nestjs-paginate';
+import { currentLocale } from 'src/helpers';
 
 @Injectable()
 export class NewsService {
@@ -28,6 +29,7 @@ export class NewsService {
   }
 
   async findOne(id: number): Promise<News> {
+    const local = currentLocale();
     const news = await this.newsRepository.findOne({
       where: { 
         id,
@@ -55,6 +57,10 @@ export class NewsService {
       throw new NotFoundException(`News with ID ${id} not found or not published`);
     }
 
-    return news;
+    return {
+      ...news,
+      title: news.title[local],
+      description: news.description[local],
+    } as News;
   }
 }
