@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { News, NewsStatus } from 'src/databases/typeorm/entities';
 import { PaginateQuery, Paginated, paginate } from 'nestjs-paginate';
-import { currentLocale } from 'src/helpers';
+import { currentLocale } from 'src/common/utils';
 
 @Injectable()
 export class NewsService {
