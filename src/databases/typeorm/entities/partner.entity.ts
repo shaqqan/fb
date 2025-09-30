@@ -20,10 +20,10 @@ export class Partner {
   @Column()
   image: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone: string;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
   @Column({

@@ -47,6 +47,7 @@ export class CreatePersonalDto {
   })
   @IsNotEmpty()
   @IsString()
+  @IsOptional()
   @MaxLength(20)
   phone: string;
 
@@ -55,8 +56,8 @@ export class CreatePersonalDto {
     example: 'john.doe@example.com',
     maxLength: 100
   })
-  @IsNotEmpty()
   @IsEmail()
+  @IsOptional()
   @MaxLength(100)
   email: string;
 
