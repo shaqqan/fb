@@ -16,10 +16,10 @@ export class Personal extends BaseEntity {
     @Column({ type: 'jsonb' })
     information: any
 
-    @Column()
+    @Column({ nullable: true })
     phone: string
 
-    @Column()
+    @Column({ nullable: true })
     email: string
 
     @Column()
