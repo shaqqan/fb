@@ -1,4 +1,13 @@
-import { Controller, Post, UploadedFile, UseInterceptors, Body, Delete, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+  Body,
+  Delete,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
@@ -47,24 +56,27 @@ export class UploadController {
   })
   @ApiResponse({ status: 400, description: 'Invalid file type or size' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads',
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp|pdf)$/)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
       },
     }),
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp|pdf)$/)) {
-        return cb(new Error('Only image files are allowed!'), false);
-      }
-      cb(null, true);
-    },
-    limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB
-    }
-  }))
+  )
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
       filename: file.filename,
@@ -82,12 +94,13 @@ export class UploadController {
       properties: {
         path: {
           type: 'string',
-          description: 'Path of the file to delete (relative to uploads directory)',
-          example: '/uploads/1756045389359-719138785.jpg'
-        }
+          description:
+            'Path of the file to delete (relative to uploads directory)',
+          example: '/uploads/1756045389359-719138785.jpg',
+        },
       },
-      required: ['path']
-    }
+      required: ['path'],
+    },
   })
   @ApiResponse({ status: 200, description: 'File deleted successfully' })
   @ApiResponse({ status: 404, description: 'File not found' })
