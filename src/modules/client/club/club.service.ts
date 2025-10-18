@@ -3,7 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { Club, Match, MatchStatus } from 'src/databases/typeorm/entities';
 import { currentLocale } from 'src/common/utils';
-import { PaginateQuery, Paginated, paginate, FilterOperator } from 'nestjs-paginate';
+import {
+  PaginateQuery,
+  Paginated,
+  paginate,
+  FilterOperator,
+} from 'nestjs-paginate';
 import { ClubPointDto } from './dto/club-point.dto';
 
 @Injectable()
@@ -13,9 +18,9 @@ export class ClubService {
     private clubRepository: Repository<Club>,
     @InjectRepository(Match)
     private matchRepository: Repository<Match>,
-  ) { }
+  ) {}
 
-  async list(): Promise<{ id: number, name: string, logo: string }[]> {
+  async list(): Promise<{ id: number; name: string; logo: string }[]> {
     const local = currentLocale();
     const clubs = await this.clubRepository.find({
       select: {
@@ -30,7 +35,7 @@ export class ClubService {
       },
     });
 
-    return clubs.map(club => ({
+    return clubs.map((club) => ({
       id: club.id,
       name: club.name[local],
       logo: club.logo,
@@ -76,18 +81,25 @@ export class ClubService {
       ...club,
       name: club.name[local],
       information: club.information?.[local] || null,
-      league: club.league ? {
-        ...club.league,
-        title: club.league.title[local],
-      } : null,
-      subLeague: club.subLeague ? {
-        ...club.subLeague,
-        title: club.subLeague.title[local],
-      } : null,
+      league: club.league
+        ? {
+            ...club.league,
+            title: club.league.title[local],
+          }
+        : null,
+      subLeague: club.subLeague
+        ? {
+            ...club.subLeague,
+            title: club.subLeague.title[local],
+          }
+        : null,
     } as Club;
   }
 
-  async getMatchHistory(clubId: number, query: PaginateQuery): Promise<Paginated<Match>> {
+  async getMatchHistory(
+    clubId: number,
+    query: PaginateQuery,
+  ): Promise<Paginated<Match>> {
     // Verify club exists
     const club = await this.clubRepository.findOne({ where: { id: clubId } });
     if (!club) {
@@ -95,7 +107,13 @@ export class ClubService {
     }
 
     return paginate(query, this.matchRepository, {
-      relations: ['club', 'opponentClub', 'clubLeague', 'opponentLeague', 'stadium'],
+      relations: [
+        'club',
+        'opponentClub',
+        'clubLeague',
+        'opponentLeague',
+        'stadium',
+      ],
       select: [
         'id',
         'matchDate',
@@ -119,7 +137,12 @@ export class ClubService {
       sortableColumns: ['id', 'matchDate', 'status'],
       nullSort: 'last',
       defaultSortBy: [['matchDate', 'DESC']],
-      searchableColumns: ['club.name', 'opponentClub.name', 'clubLeague.title', 'opponentLeague.title'],
+      searchableColumns: [
+        'club.name',
+        'opponentClub.name',
+        'clubLeague.title',
+        'opponentLeague.title',
+      ],
       filterableColumns: {
         status: [FilterOperator.EQ],
         matchDate: [FilterOperator.BTW, FilterOperator.GTE, FilterOperator.LTE],
@@ -134,12 +157,15 @@ export class ClubService {
       maxLimit: 50,
       where: [
         { clubId: clubId, status: MatchStatus.FINISHED },
-        { opponentClubId: clubId, status: MatchStatus.FINISHED }
-      ]
+        { opponentClubId: clubId, status: MatchStatus.FINISHED },
+      ],
     });
   }
 
-  async getUpcomingMatches(clubId: number, query: PaginateQuery): Promise<Paginated<Match>> {
+  async getUpcomingMatches(
+    clubId: number,
+    query: PaginateQuery,
+  ): Promise<Paginated<Match>> {
     // Verify club exists
     const club = await this.clubRepository.findOne({ where: { id: clubId } });
     if (!club) {
@@ -147,7 +173,13 @@ export class ClubService {
     }
 
     return paginate(query, this.matchRepository, {
-      relations: ['club', 'opponentClub', 'clubLeague', 'opponentLeague', 'stadium'],
+      relations: [
+        'club',
+        'opponentClub',
+        'clubLeague',
+        'opponentLeague',
+        'stadium',
+      ],
       select: [
         'id',
         'matchDate',
@@ -171,7 +203,12 @@ export class ClubService {
       sortableColumns: ['id', 'matchDate', 'status'],
       nullSort: 'last',
       defaultSortBy: [['matchDate', 'ASC']],
-      searchableColumns: ['club.name', 'opponentClub.name', 'clubLeague.title', 'opponentLeague.title'],
+      searchableColumns: [
+        'club.name',
+        'opponentClub.name',
+        'clubLeague.title',
+        'opponentLeague.title',
+      ],
       filterableColumns: {
         status: [FilterOperator.EQ],
         matchDate: [FilterOperator.BTW, FilterOperator.GTE, FilterOperator.LTE],
@@ -190,8 +227,8 @@ export class ClubService {
         { clubId: clubId, status: MatchStatus.HALF_TIME },
         { opponentClubId: clubId, status: MatchStatus.SCHEDULED },
         { opponentClubId: clubId, status: MatchStatus.LIVE },
-        { opponentClubId: clubId, status: MatchStatus.HALF_TIME }
-      ]
+        { opponentClubId: clubId, status: MatchStatus.HALF_TIME },
+      ],
     });
   }
 
@@ -224,92 +261,121 @@ export class ClubService {
       },
     });
 
-    const clubStats = await Promise.all(clubs.map(async club => {
-      const matches = await this.matchRepository.find({
-        where: [
-          {
-            clubId: club.id,
-            status: MatchStatus.FINISHED,
-            ...(startDate && endDate ? { matchDate: Between(startDate, endDate) } : {})
-          },
-          {
-            opponentClubId: club.id,
-            status: MatchStatus.FINISHED,
-            ...(startDate && endDate ? { matchDate: Between(startDate, endDate) } : {})
-          }
-        ],
-        select: ['id', 'clubId', 'opponentClubId', 'clubScore', 'opponentClubScore', 'clubLeagueId', 'clubSubLeagueId', 'opponentLeagueId', 'opponentSubLeagueId']
-      });
+    const clubStats = await Promise.all(
+      clubs.map(async (club) => {
+        const matches = await this.matchRepository.find({
+          where: [
+            {
+              clubId: club.id,
+              status: MatchStatus.FINISHED,
+              ...(startDate && endDate
+                ? { matchDate: Between(startDate, endDate) }
+                : {}),
+            },
+            {
+              opponentClubId: club.id,
+              status: MatchStatus.FINISHED,
+              ...(startDate && endDate
+                ? { matchDate: Between(startDate, endDate) }
+                : {}),
+            },
+          ],
+          select: [
+            'id',
+            'clubId',
+            'opponentClubId',
+            'clubScore',
+            'opponentClubScore',
+            'clubLeagueId',
+            'clubSubLeagueId',
+            'opponentLeagueId',
+            'opponentSubLeagueId',
+          ],
+        });
 
-      let matchesPlayed = 0;
-      let wins = 0;
-      let draws = 0;
-      let losses = 0;
-      let goalsScored = 0;
-      let goalsConceded = 0;
-      let totalPoints = 0;
+        let matchesPlayed = 0;
+        let wins = 0;
+        let draws = 0;
+        let losses = 0;
+        let goalsScored = 0;
+        let goalsConceded = 0;
+        let totalPoints = 0;
 
-      matches.forEach(match => {
-        if (match.clubScore !== null && match.opponentClubScore !== null) {
-          let shouldCountMatch = false;
-
-          if (match.clubId === club.id) {
-            shouldCountMatch = match.opponentLeagueId === match.clubLeagueId &&
-              match.opponentSubLeagueId === match.clubSubLeagueId;
-          } else {
-            shouldCountMatch = match.clubLeagueId === match.opponentLeagueId &&
-              match.clubSubLeagueId === match.opponentSubLeagueId;
-          }
-
-          if (shouldCountMatch) {
-            matchesPlayed++;
+        matches.forEach((match) => {
+          if (match.clubScore !== null && match.opponentClubScore !== null) {
+            let shouldCountMatch = false;
 
             if (match.clubId === club.id) {
-              // Club is the home team
-              goalsScored += match.clubScore;
-              goalsConceded += match.opponentClubScore;
-
-              if (match.clubScore > match.opponentClubScore) {
-                wins++;
-                totalPoints += 3; // Victory = +3 points
-              } else if (match.clubScore === match.opponentClubScore) {
-                draws++;
-                totalPoints += 1; // Draw = +1 point
-              } else {
-                losses++;
-              }
+              shouldCountMatch =
+                match.opponentLeagueId === match.clubLeagueId &&
+                match.opponentSubLeagueId === match.clubSubLeagueId;
             } else {
-              // Club is the away team (opponent)
-              goalsScored += match.opponentClubScore;
-              goalsConceded += match.clubScore;
+              shouldCountMatch =
+                match.clubLeagueId === match.opponentLeagueId &&
+                match.clubSubLeagueId === match.opponentSubLeagueId;
+            }
 
-              if (match.opponentClubScore > match.clubScore) {
-                wins++;
-                totalPoints += 3; // Victory = +3 points
-              } else if (match.opponentClubScore === match.clubScore) {
-                draws++;
-                totalPoints += 1; // Draw = +1 point
+            if (shouldCountMatch) {
+              matchesPlayed++;
+
+              if (match.clubId === club.id) {
+                // Club is the home team
+                goalsScored += match.clubScore;
+                goalsConceded += match.opponentClubScore;
+
+                if (match.clubScore > match.opponentClubScore) {
+                  wins++;
+                  totalPoints += 3; // Victory = +3 points
+                } else if (match.clubScore === match.opponentClubScore) {
+                  draws++;
+                  totalPoints += 1; // Draw = +1 point
+                } else {
+                  losses++;
+                }
               } else {
-                losses++;
+                // Club is the away team (opponent)
+                goalsScored += match.opponentClubScore;
+                goalsConceded += match.clubScore;
+
+                if (match.opponentClubScore > match.clubScore) {
+                  wins++;
+                  totalPoints += 3; // Victory = +3 points
+                } else if (match.opponentClubScore === match.clubScore) {
+                  draws++;
+                  totalPoints += 1; // Draw = +1 point
+                } else {
+                  losses++;
+                }
               }
             }
           }
-        }
-      });
+        });
 
-      return {
-        id: club.id,
-        name: club.name[local],
-        logo: club.logo,
-        matches_played: matchesPlayed,
-        wins: wins,
-        draws: draws,
-        losses: losses,
-        goals_scored: goalsScored,
-        goals_conceded: goalsConceded,
-        total_points: totalPoints,
-      };
-    }));
+        return {
+          id: club.id,
+          name: club.name[local],
+          logo: club.logo,
+          matches_played: matchesPlayed,
+          wins: wins,
+          draws: draws,
+          losses: losses,
+          goals_scored: goalsScored,
+          goals_conceded: goalsConceded,
+          total_points: totalPoints,
+        };
+      }),
+    );
+
+    // Sort clubs by: 1) total_points (desc), 2) goals_scored (desc), 3) goals_conceded (asc)
+    clubStats.sort((a, b) => {
+      if (b.total_points !== a.total_points) {
+        return b.total_points - a.total_points;
+      }
+      if (b.goals_scored !== a.goals_scored) {
+        return b.goals_scored - a.goals_scored;
+      }
+      return a.goals_conceded - b.goals_conceded;
+    });
 
     return clubStats;
   }
