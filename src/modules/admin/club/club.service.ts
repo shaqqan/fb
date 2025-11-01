@@ -13,7 +13,7 @@ export class ClubService {
   constructor(
     @InjectRepository(Club)
     private clubRepository: Repository<Club>,
-  ) { }
+  ) {}
 
   async create(createClubDto: CreateClubDto): Promise<Club> {
     const club = await this.clubRepository.create({
@@ -42,7 +42,7 @@ export class ClubService {
         'league.id',
         'league.title',
         'subLeague.id',
-        'subLeague.title'
+        'subLeague.title',
       ]);
 
     const local = currentLocale();
@@ -53,7 +53,7 @@ export class ClubService {
           CAST(club.name->>:locale AS text) ILIKE :search OR 
           CAST(club.information->>:locale AS text) ILIKE :search
         )`,
-        { search: `%${query.search}%`, locale: local }
+        { search: `%${query.search}%`, locale: local },
       );
     }
 
@@ -70,16 +70,24 @@ export class ClubService {
     });
   }
 
-  async list(listClubDto: ListClubDto): Promise<{ id: number, name: string, logo: string }[]> {
+  async list(
+    listClubDto: ListClubDto,
+  ): Promise<{ id: number; name: string; logo: string }[]> {
     const local = currentLocale();
+    const whereCondition: any = { league: { id: listClubDto.leagueId } };
+
+    if (listClubDto.subLeagueId) {
+      whereCondition.subLeague = { id: listClubDto.subLeagueId };
+    }
+
     const clubs = await this.clubRepository.find({
-      where: { league: { id: listClubDto.leagueId } },
+      where: whereCondition,
       relations: ['league', 'subLeague'],
     });
 
-    return clubs.map(club => ({
+    return clubs.map((club) => ({
       id: club.id,
-      name: club.name[local],
+      name: (club.name?.[local] as string) || '',
       logo: club.logo,
     }));
   }
@@ -124,7 +132,9 @@ export class ClubService {
     }
 
     if (updateClubDto.subLeagueId !== undefined) {
-      updateData.subLeague = updateClubDto.subLeagueId ? { id: updateClubDto.subLeagueId } : null;
+      updateData.subLeague = updateClubDto.subLeagueId
+        ? { id: updateClubDto.subLeagueId }
+        : null;
       delete updateData.subLeagueId;
     }
 
