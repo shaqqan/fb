@@ -10,7 +10,7 @@ export class NewsService {
   constructor(
     @InjectRepository(News)
     private readonly newsRepository: Repository<News>,
-  ) { }
+  ) {}
 
   async findAll(query: PaginateQuery): Promise<Paginated<News>> {
     const queryBuilder = this.newsRepository
@@ -21,7 +21,10 @@ export class NewsService {
       select: ['id', 'title', 'description', 'images', 'status', 'publishedAt'],
       sortableColumns: ['id', 'createdAt', 'updatedAt', 'publishedAt'],
       nullSort: 'last',
-      defaultSortBy: [['publishedAt', 'DESC'], ['createdAt', 'DESC']],
+      defaultSortBy: [
+        ['publishedAt', 'DESC'],
+        ['createdAt', 'DESC'],
+      ],
       searchableColumns: ['title', 'description'],
       defaultLimit: 10,
       maxLimit: 50,
@@ -31,9 +34,9 @@ export class NewsService {
   async findOne(id: number): Promise<News> {
     const local = currentLocale();
     const news = await this.newsRepository.findOne({
-      where: { 
+      where: {
         id,
-        status: NewsStatus.PUBLISHED 
+        status: NewsStatus.PUBLISHED,
       },
       relations: ['author'],
       select: {
@@ -49,12 +52,14 @@ export class NewsService {
           id: true,
           name: true,
           avatar: true,
-        }
-      }
+        },
+      },
     });
 
     if (!news) {
-      throw new NotFoundException(`News with ID ${id} not found or not published`);
+      throw new NotFoundException(
+        `News with ID ${id} not found or not published`,
+      );
     }
 
     return {
