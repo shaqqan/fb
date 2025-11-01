@@ -35,9 +35,11 @@ export class MatchScheduleService {
       .leftJoinAndSelect('match.club', 'club')
       .leftJoinAndSelect('match.clubLeague', 'clubLeague')
       .leftJoinAndSelect('match.clubSubLeague', 'clubSubLeague')
+      .leftJoinAndSelect('match.clubMiniLeague', 'clubMiniLeague')
       .leftJoinAndSelect('match.opponentClub', 'opponentClub')
       .leftJoinAndSelect('match.opponentLeague', 'opponentLeague')
       .leftJoinAndSelect('match.opponentSubLeague', 'opponentSubLeague')
+      .leftJoinAndSelect('match.opponentMiniLeague', 'opponentMiniLeague')
       .leftJoinAndSelect('match.stadium', 'stadium')
       .leftJoinAndSelect('match.matchScores', 'matchScores')
       .select([
@@ -115,6 +117,17 @@ export class MatchScheduleService {
         queryBuilder.andWhere('(clubSubLeague.id = :subLeagueId OR opponentSubLeague.id = :subLeagueId)', { subLeagueId: query.filter.subLeagueId });
       }
 
+      // Mini-league filters
+      if (query.filter.clubMiniLeagueId) {
+        queryBuilder.andWhere('clubMiniLeague.id = :clubMiniLeagueId', { clubMiniLeagueId: query.filter.clubMiniLeagueId });
+      }
+      if (query.filter.opponentMiniLeagueId) {
+        queryBuilder.andWhere('opponentMiniLeague.id = :opponentMiniLeagueId', { opponentMiniLeagueId: query.filter.opponentMiniLeagueId });
+      }
+      if (query.filter.miniLeagueId) {
+        queryBuilder.andWhere('(clubMiniLeague.id = :miniLeagueId OR opponentMiniLeague.id = :miniLeagueId)', { miniLeagueId: query.filter.miniLeagueId });
+      }
+
       // Stadium filter
       if (query.filter.stadiumId) {
         queryBuilder.andWhere('stadium.id = :stadiumId', { stadiumId: query.filter.stadiumId });
@@ -182,9 +195,11 @@ export class MatchScheduleService {
         'club',
         'clubLeague',
         'clubSubLeague',
+        'clubMiniLeague',
         'opponentClub',
         'opponentLeague',
         'opponentSubLeague',
+        'opponentMiniLeague',
         'stadium',
       ],
       select: {
@@ -206,6 +221,10 @@ export class MatchScheduleService {
           id: true,
           title: true,
         },
+        clubMiniLeague: {
+          id: true,
+          title: true,
+        },
         opponentClub: {
           id: true,
           name: true,
@@ -216,6 +235,10 @@ export class MatchScheduleService {
           title: true,
         },
         opponentSubLeague: {
+          id: true,
+          title: true,
+        },
+        opponentMiniLeague: {
           id: true,
           title: true,
         },

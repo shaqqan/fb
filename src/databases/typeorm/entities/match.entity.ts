@@ -1,113 +1,136 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Club } from "./club.entity";
-import { League } from "./league.entity";
-import { Stadium } from "./stadium.entity";
-import { MatchScore } from "./match-score.entity";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Club } from './club.entity';
+import { League } from './league.entity';
+import { Stadium } from './stadium.entity';
+import { MatchScore } from './match-score.entity';
 
 export enum MatchStatus {
-    SCHEDULED = 'scheduled',
-    LIVE = 'live',
-    HALF_TIME = 'half_time',
-    FINISHED = 'finished',
-    POSTPONED = 'postponed',
-    CANCELLED = 'cancelled',
-    ABANDONED = 'abandoned',
-    EXTRA_TIME = 'extra_time',
-    PENALTY_SHOOTOUT = 'penalty_shootout',
-    AWARDED = 'awarded',
+  SCHEDULED = 'scheduled',
+  LIVE = 'live',
+  HALF_TIME = 'half_time',
+  FINISHED = 'finished',
+  POSTPONED = 'postponed',
+  CANCELLED = 'cancelled',
+  ABANDONED = 'abandoned',
+  EXTRA_TIME = 'extra_time',
+  PENALTY_SHOOTOUT = 'penalty_shootout',
+  AWARDED = 'awarded',
 }
 
 @Entity('matches')
 export class Match extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @ManyToOne(() => Club)
-    @JoinColumn({ name: 'clubId' })
-    club: Club;
+  @ManyToOne(() => Club)
+  @JoinColumn({ name: 'clubId' })
+  club: Club;
 
-    @Column()
-    clubId: number;
+  @Column()
+  clubId: number;
 
-    @ManyToOne(() => League)
-    @JoinColumn({ name: 'clubLeagueId' })
-    clubLeague: League;
+  @ManyToOne(() => League)
+  @JoinColumn({ name: 'clubLeagueId' })
+  clubLeague: League;
 
-    @Column()
-    clubSubLeagueId: number;
+  @Column()
+  clubLeagueId: number;
 
-    @ManyToOne(() => League)
-    @JoinColumn({ name: 'clubSubLeagueId' })
-    clubSubLeague: League;
+  @ManyToOne(() => League)
+  @JoinColumn({ name: 'clubSubLeagueId' })
+  clubSubLeague: League;
 
-    @Column()
-    clubLeagueId: number;
+  @Column()
+  clubSubLeagueId: number;
 
-    @ManyToOne(() => Club)
-    @JoinColumn({ name: 'opponentClubId' })
-    opponentClub: Club;
+  @Column({ nullable: true })
+  clubMiniLeagueId: number | null;
 
-    @Column()
-    opponentClubId: number;
+  @ManyToOne(() => League, { nullable: true })
+  @JoinColumn({ name: 'clubMiniLeagueId' })
+  clubMiniLeague: League | null;
 
-    @ManyToOne(() => League)
-    @JoinColumn({ name: 'opponentLeagueId' })
-    opponentLeague: League;
+  @ManyToOne(() => Club)
+  @JoinColumn({ name: 'opponentClubId' })
+  opponentClub: Club;
 
-    @Column()
-    opponentSubLeagueId: number;
+  @Column()
+  opponentClubId: number;
 
-    @Column()
-    opponentLeagueId: number;
+  @ManyToOne(() => League)
+  @JoinColumn({ name: 'opponentLeagueId' })
+  opponentLeague: League;
 
-    @ManyToOne(() => League)
-    @JoinColumn({ name: 'opponentSubLeagueId' })
-    opponentSubLeague: League;
+  @Column()
+  opponentLeagueId: number;
 
-    @Column({
-        type: 'timestamp with time zone',
-    })
-    matchDate: Date;
+  @ManyToOne(() => League)
+  @JoinColumn({ name: 'opponentSubLeagueId' })
+  opponentSubLeague: League;
 
-    @ManyToOne(() => Stadium)
-    @JoinColumn({ name: 'stadiumId' })
-    stadium: Stadium;
+  @Column()
+  opponentSubLeagueId: number;
 
-    @Column()
-    stadiumId: number;
+  @Column({ nullable: true })
+  opponentMiniLeagueId: number | null;
 
-    @Column({
-        type: 'enum',
-        enum: MatchStatus,
-        default: MatchStatus.SCHEDULED,
-    })
-    status: MatchStatus;
+  @ManyToOne(() => League, { nullable: true })
+  @JoinColumn({ name: 'opponentMiniLeagueId' })
+  opponentMiniLeague: League | null;
 
-    @OneToMany(() => MatchScore, (matchScore) => matchScore.match)
-    matchScores: MatchScore[];
+  @Column({
+    type: 'timestamp with time zone',
+  })
+  matchDate: Date;
 
-    @Column({
-        type: 'integer',
-        nullable: true
-    })
-    clubScore: number | null;
+  @ManyToOne(() => Stadium)
+  @JoinColumn({ name: 'stadiumId' })
+  stadium: Stadium;
 
-    @Column({
-        type: 'integer',
-        nullable: true
-    })
-    opponentClubScore: number | null;
+  @Column()
+  stadiumId: number;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({
+    type: 'enum',
+    enum: MatchStatus,
+    default: MatchStatus.SCHEDULED,
+  })
+  status: MatchStatus;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @OneToMany(() => MatchScore, (matchScore) => matchScore.match)
+  matchScores: MatchScore[];
 
-    @Column({ 
-        type: 'varchar',
-        nullable: true 
-    })
-    file: string | null;
+  @Column({
+    type: 'integer',
+    nullable: true,
+  })
+  clubScore: number | null;
 
-}  
+  @Column({
+    type: 'integer',
+    nullable: true,
+  })
+  opponentClubScore: number | null;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  file: string | null;
+}

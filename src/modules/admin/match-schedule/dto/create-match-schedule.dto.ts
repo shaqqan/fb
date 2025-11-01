@@ -34,6 +34,16 @@ export class CreateMatchScheduleDto {
   clubSubLeagueId?: number;
 
   @ApiProperty({
+    description: 'Club mini league ID',
+    example: 3,
+    required: false
+  })
+  @IsOptional()
+  @IsNumber()
+  @Exists(League, 'id')
+  clubMiniLeagueId?: number | null;
+
+  @ApiProperty({
     description: 'Opponent club ID',
     example: 3
   })
@@ -59,6 +69,16 @@ export class CreateMatchScheduleDto {
   @IsNumber()
   @Exists(League, 'id')
   opponentSubLeagueId?: number;
+
+  @ApiProperty({
+    description: 'Opponent mini league ID',
+    example: 3,
+    required: false
+  })
+  @IsOptional()
+  @IsNumber()
+  @Exists(League, 'id')
+  opponentMiniLeagueId?: number | null;
 
   @ApiProperty({
     description: 'Match date and time',

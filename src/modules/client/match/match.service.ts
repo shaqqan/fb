@@ -59,8 +59,10 @@ export class MatchService {
         'opponentClub',
         'clubLeague',
         'clubSubLeague',
+        'clubMiniLeague',
         'opponentLeague',
         'opponentSubLeague',
+        'opponentMiniLeague',
         'stadium',
       ],
       select: [
@@ -77,12 +79,24 @@ export class MatchService {
         'clubLeague.id',
         'clubLeague.title',
 
+        'clubSubLeague.id',
+        'clubSubLeague.title',
+
+        'clubMiniLeague.id',
+        'clubMiniLeague.title',
+
         'opponentClub.id',
         'opponentClub.name',
         'opponentClub.logo',
 
         'opponentLeague.id',
         'opponentLeague.title',
+
+        'opponentSubLeague.id',
+        'opponentSubLeague.title',
+
+        'opponentMiniLeague.id',
+        'opponentMiniLeague.title',
       ],
       sortableColumns: ['id', 'matchDate', 'status'],
       nullSort: 'last',
@@ -94,7 +108,11 @@ export class MatchService {
         'club.id': [FilterOperator.EQ],
         'opponentClub.id': [FilterOperator.EQ],
         'clubLeague.id': [FilterOperator.EQ],
+        'clubSubLeague.id': [FilterOperator.EQ],
+        'clubMiniLeague.id': [FilterOperator.EQ],
         'opponentLeague.id': [FilterOperator.EQ],
+        'opponentSubLeague.id': [FilterOperator.EQ],
+        'opponentMiniLeague.id': [FilterOperator.EQ],
       },
       defaultLimit: 10,
       maxLimit: 50,
