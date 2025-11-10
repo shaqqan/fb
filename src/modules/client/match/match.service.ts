@@ -71,6 +71,7 @@ export class MatchService {
         'status',
         'clubScore',
         'opponentClubScore',
+        'youtube_link',
 
         'club.id',
         'club.name',
