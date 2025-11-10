@@ -141,4 +141,13 @@ export class CreateMatchScheduleDto {
   @IsString()
   @MaxLength(255)
   file?: string;
+
+  @ApiProperty({
+    description: 'YouTube video link',
+    example: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    required: false
+  })
+  @IsOptional()
+  @IsString()
+  youtube_link?: string;
 }

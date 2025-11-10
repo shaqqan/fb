@@ -133,4 +133,10 @@ export class Match extends BaseEntity {
     nullable: true,
   })
   file: string | null;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  youtube_link: string | null;
 }
