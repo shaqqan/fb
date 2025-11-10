@@ -251,6 +251,7 @@ export class MatchScheduleService {
         file: true,
         clubScore: true,
         opponentClubScore: true,
+        youtube_link: true,
       },
     });
 
